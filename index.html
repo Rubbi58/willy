@@ -1,143 +1,860 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Simple Maze Game</title>
+  <meta charset="UTF-8" />
+  <title>Hubios Communism Party – Hóriver's Lair</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      background: #111;
-      color: #eee;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 0;
+      background: #050105;
+      color: #fddf62;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
     }
+
+    #game-wrapper {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 20px;
+      color: #fddf62;
+    }
+
     h1 {
+      letter-spacing: 0.2em;
+      font-size: 20px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    #subtitle {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    #game-frame {
+      border: 3px solid #fddf62;
+      width: 960px;
+      height: 640px;
+      position: relative;
+      background: #020003;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #050107;
+    }
+
+    #footer-text {
+      margin-top: 8px;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .hidden { display: none; }
+
+    /* MENU / INTRO */
+
+    #menu-overlay,
+    #title-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(5,1,7,0.9), #050105 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    #menu-text,
+    #title-text {
+      font-size: 18px;
+      max-width: 720px;
+      line-height: 1.5;
+    }
+
+    #menu-hint {
+      font-size: 12px;
+      opacity: 0.7;
       margin-top: 10px;
     }
-    #game-container {
+
+    #ready-text {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    #horiver-title-screen {
+      position: absolute;
+      inset: 0;
+      background: #050105;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: calc(100vh - 60px);
+      gap: 20px;
+      text-align: center;
     }
-    canvas {
-      border: 2px solid #eee;
+
+    #horiver-title-screen img {
+      max-width: 420px;
+      max-height: 260px;
+      object-fit: contain;
+      border-radius: 12px;
+      border: 2px solid #fddf62;
       background: #000;
     }
-    #message {
-      margin-top: 15px;
-      font-size: 18px;
-      min-height: 24px;
+
+    #horiver-main-title {
+      font-size: 28px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
     }
-    #controls {
-      margin-top: 10px;
+
+    #horiver-subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .btn {
+      border: 2px solid #fddf62;
+      padding: 10px 28px;
+      border-radius: 999px;
+      font-size: 15px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      background: transparent;
+      color: #fddf62;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 12px rgba(253,223,98,0.35);
+      background: rgba(253,223,98,0.08);
+    }
+    .btn:active { transform: translateY(0); box-shadow: none; }
+
+    /* HUD */
+
+    #hud {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-shadow: 0 0 4px #000;
+      pointer-events: none;
+    }
+
+    #status-message {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 14px;
-      opacity: 0.8;
+      padding: 6px 12px;
+      background: rgba(5,1,7,0.85);
+      border-radius: 999px;
+      border: 1px solid rgba(253,223,98,0.4);
+      box-shadow: 0 0 12px rgba(0,0,0,0.8);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    #status-message.visible { opacity: 1; }
+
+    #game-over-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      text-align: center;
+      padding: 20px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-color: rgba(5,1,7,0.96);
+    }
+    #game-over-overlay.hidden { display: none; }
+
+    #game-over-title {
+      font-size: 26px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-shadow: 0 0 6px #000;
+    }
+
+    #game-over-sub {
+      font-size: 15px;
+      max-width: 620px;
+      line-height: 1.5;
+      text-shadow: 0 0 4px #000;
+    }
+
+    @media (max-width: 980px) {
+      #game-frame {
+        width: 100vw;
+        height: calc(100vw * 2/3);
+        max-height: 640px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Simple Maze Game</h1>
-  <div id="game-container">
-    <canvas id="game" width="400" height="400"></canvas>
-    <div id="message"></div>
-    <div id="controls">Move with W A S D</div>
+<div id="game-wrapper">
+  <h1>HÓRIVER'S LAIR – LEVEL 1</h1>
+  <div id="subtitle">
+    MISSION: FIND THE FLASHLIGHT, KEY, VAPE AND BATHROOM IN HÓRIVER'S ENDLESS CASTLE
   </div>
 
-  <script>
-    const canvas = document.getElementById('game');
-    const ctx = canvas.getContext('2d');
-    const messageEl = document.getElementById('message');
+  <div id="game-frame">
+    <!-- Intro -->
+    <div id="menu-overlay">
+      <div id="menu-text"></div>
+      <div id="menu-hint">Click anywhere to continue</div>
+    </div>
 
-    const tileSize = 40; 
-    const rows = 10;
-    const cols = 10;
+    <div id="title-overlay" class="hidden">
+      <div id="ready-text"></div>
+      <div id="menu-hint">Click if you dare...</div>
+    </div>
 
-    const maze = [
-      [0,1,1,1,1,1,1,1,1,1],
-      [0,0,0,0,0,1,0,0,0,1],
-      [1,0,1,1,0,1,0,1,0,1],
-      [1,0,1,0,0,0,0,1,0,1],
-      [1,0,1,0,1,1,0,1,0,1],
-      [1,0,0,0,0,0,0,1,0,1],
-      [1,1,1,1,1,1,0,1,0,1],
-      [1,0,0,0,0,0,0,1,0,1],
-      [1,0,1,1,1,1,1,1,0,1],
-      [1,0,0,0,0,0,0,0,2,1]
-    ];
+    <div id="horiver-title-screen" class="hidden">
+      <img id="horiver-lair-img" src="images/horiver-lair.png" alt="Hóriver's Lair" />
+      <div id="horiver-main-title">HORIVER'S LAIR</div>
+      <div id="horiver-subtitle">Enter</div>
+      <button id="enter-btn" class="btn">Enter</button>
+    </div>
 
-    let player = { x: 0, y: 0 };
-    let gameWon = false;
+    <!-- Game canvas -->
+    <canvas id="gameCanvas" width="960" height="640" class="hidden"></canvas>
 
-    function drawMaze() {
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-          const cell = maze[y][x];
+    <!-- HUD -->
+    <div id="hud"></div>
+    <div id="status-message"></div>
 
-          if (cell === 1) ctx.fillStyle = '#444';
-          else if (cell === 2) ctx.fillStyle = '#0a0';
-          else ctx.fillStyle = '#111';
+    <!-- Game over / win -->
+    <div id="game-over-overlay" class="hidden">
+      <div id="game-over-title"></div>
+      <div id="game-over-sub"></div>
+      <button id="restart-btn" class="btn">Restart from Lair Entrance</button>
+    </div>
+  </div>
 
-          ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-          ctx.strokeStyle = '#222';
-          ctx.strokeRect(x * tileSize, y * tileSize, tileSize, tileSize);
+  <div id="footer-text">
+    Move with <strong>W A S D</strong>. Closets = safe. Hóriver kills on contact. Fog is thick – use the flashlight.
+  </div>
+</div>
+
+<!-- Background music -->
+<audio id="bgMusic" src="sounds/backg-music.mp3" loop></audio>
+
+<script>
+  /*************** ASSETS ***************/
+  const imgDungeon = new Image();
+  imgDungeon.src = "images/dungeons-pack.png";
+
+  const imgPlayer = new Image();
+  imgPlayer.src = "images/player.png";
+
+  const imgHoriver = new Image();
+  imgHoriver.src = "images/horiver-character.png";
+
+  const imgFlashlight = new Image();
+  imgFlashlight.src = "images/pixel-flashlight.png";
+
+  const imgKey = new Image();
+  imgKey.src = "images/key pixel.png";
+
+  const imgVape = new Image();
+  imgVape.src = "images/vape pixel.png";
+
+  const imgJumpscare = new Image();
+  imgJumpscare.src = "images/horiver-jumpscare.png";
+
+  // Sounds
+  const sMenuClick = new Audio("sounds/menu-click.mp3");
+  const sStart = new Audio("sounds/start-sound.mp3");
+  const sItemPickup = new Audio("sounds/item-pickup.mp3");
+  const sDoorOpen = new Audio("sounds/door-open.mp3");
+  const sDeathScream = new Audio("sounds/horiver-death-scream.mp3");
+  const sJumpscare = new Audio("sounds/jumpscare.mp3");
+  const sToiletFlush = new Audio("sounds/toilet-flush.mp3");
+  const sWin = new Audio("sounds/win.mp3");
+
+  /*************** TYPEWRITER INTRO ***************/
+  const introLines = [
+    "Welcome to Hubios communism party game.",
+    "Your mission is to save Communism Iceland,",
+    "but first, you need to defeat some foes...",
+    "now you'll enter... Horiver's lair!!!"
+  ];
+  const readyLine = "Are you ready?";
+
+  const menuOverlay = document.getElementById("menu-overlay");
+  const menuTextEl = document.getElementById("menu-text");
+  const titleOverlay = document.getElementById("title-overlay");
+  const readyTextEl = document.getElementById("ready-text");
+  const horiverTitleScreen = document.getElementById("horiver-title-screen");
+  const enterBtn = document.getElementById("enter-btn");
+  const canvas = document.getElementById("gameCanvas");
+  const hud = document.getElementById("hud");
+  const statusMessage = document.getElementById("status-message");
+  const bgMusic = document.getElementById("bgMusic");
+  const gameOverOverlay = document.getElementById("game-over-overlay");
+  const gameOverTitle = document.getElementById("game-over-title");
+  const gameOverSub = document.getElementById("game-over-sub");
+  const restartBtn = document.getElementById("restart-btn");
+
+  let introIndex = 0;
+  let typing = false;
+  let menuStage = 0; // 0 = intro, 1 = ready, 2 = lair screen, 3 = game
+
+  function typeText(el, text, cb, speed = 32) {
+    el.textContent = "";
+    let i = 0;
+    typing = true;
+    const interval = setInterval(() => {
+      el.textContent += text[i];
+      i++;
+      if (i >= text.length) {
+        clearInterval(interval);
+        typing = false;
+        if (cb) cb();
+      }
+    }, speed);
+  }
+
+  function showNextIntro() {
+    if (introIndex < introLines.length) {
+      typeText(menuTextEl, introLines[introIndex], null);
+      introIndex++;
+    } else {
+      menuStage = 1;
+      menuOverlay.classList.add("hidden");
+      titleOverlay.classList.remove("hidden");
+      typeText(readyTextEl, readyLine, null, 45);
+    }
+  }
+
+  menuOverlay.addEventListener("click", () => {
+    if (typing) return;
+    sMenuClick.currentTime = 0; sMenuClick.play().catch(() => {});
+    if (menuStage === 0) showNextIntro();
+  });
+
+  titleOverlay.addEventListener("click", () => {
+    if (typing) return;
+    sMenuClick.currentTime = 0; sMenuClick.play().catch(() => {});
+    if (menuStage === 1) {
+      titleOverlay.classList.add("hidden");
+      horiverTitleScreen.classList.remove("hidden");
+      menuStage = 2;
+    }
+  });
+
+  enterBtn.addEventListener("click", () => {
+    sStart.currentTime = 0; sStart.play().catch(() => {});
+    horiverTitleScreen.classList.add("hidden");
+    canvas.classList.remove("hidden");
+    menuStage = 3;
+    // Start background music now that user interacted
+    bgMusic.volume = 0.7;
+    bgMusic.play().catch(() => {});
+    startGame();
+  });
+
+  showNextIntro();
+
+  /*************** GAME CONSTANTS ***************/
+  const ctx = canvas.getContext("2d");
+
+  const TILE_SIZE = 32;
+  const MAP_SIZE = 100;
+  const VIEW_TILES_X = Math.floor(canvas.width / TILE_SIZE);
+  const VIEW_TILES_Y = Math.floor(canvas.height / TILE_SIZE);
+
+  const TILE_FLOOR = 0;
+  const TILE_WALL = 1;
+  const TILE_CLOSET = 2;
+  const TILE_LOCKED_DOOR = 3;
+  const TILE_FLASHLIGHT = 4;
+  const TILE_KEY = 5;
+  const TILE_VAPE = 6;
+  const TILE_BATHROOM_DOOR = 7;
+  const TILE_SPAWN = 8;
+  const TILE_HORIVER_SPAWN = 9;
+
+  let map = [];
+
+  // RNG with fixed seed so the layout is always the same
+  function mulberry32(a) {
+    return function() {
+      let t = a += 0x6D2B79F5;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  const rand = mulberry32(0xC0MMUN1S);
+
+  function createMap() {
+    map = new Array(MAP_SIZE).fill(null).map(() =>
+      new Array(MAP_SIZE).fill(TILE_FLOOR)
+    );
+
+    // Outer walls
+    for (let x = 0; x < MAP_SIZE; x++) {
+      map[0][x] = TILE_WALL;
+      map[MAP_SIZE - 1][x] = TILE_WALL;
+    }
+    for (let y = 0; y < MAP_SIZE; y++) {
+      map[y][0] = TILE_WALL;
+      map[y][MAP_SIZE - 1] = TILE_WALL;
+    }
+
+    const hallY = Math.floor(MAP_SIZE / 2);
+
+    // Central hallway
+    for (let x = 2; x < MAP_SIZE - 2; x++) {
+      map[hallY - 1][x] = TILE_WALL;
+      map[hallY + 1][x] = TILE_WALL;
+      map[hallY][x] = TILE_FLOOR;
+      if (x % 7 === 0 && x > 5 && x < MAP_SIZE - 5) {
+        map[hallY][x] = TILE_CLOSET;
+      }
+    }
+
+    function carveRoom(cx, cy, w, h) {
+      for (let y = cy; y < cy + h; y++) {
+        for (let x = cx; x < cx + w; x++) {
+          if (y <= 0 || y >= MAP_SIZE - 1 || x <= 0 || x >= MAP_SIZE - 1) continue;
+          if (y === cy || y === cy + h - 1 || x === cx || x === cx + w - 1) {
+            map[y][x] = TILE_WALL;
+          } else {
+            map[y][x] = TILE_FLOOR;
+          }
         }
       }
     }
 
-    function drawPlayer() {
-      ctx.fillStyle = '#0cf';
-      const pad = 6;
-      ctx.fillRect(
-        player.x * tileSize + pad,
-        player.y * tileSize + pad,
-        tileSize - pad * 2,
-        tileSize - pad * 2
-      );
+    carveRoom(10, hallY - 10, 16, 16);
+    carveRoom(35, hallY - 16, 20, 20);
+    carveRoom(68, hallY - 12, 18, 18);
+
+    // Doors
+    map[hallY][10 + 8] = TILE_LOCKED_DOOR; // locked door to left room
+    map[hallY][35 + 10] = TILE_FLOOR;
+    map[hallY][68 + 9] = TILE_FLOOR;
+
+    // Spawn points
+    map[hallY][3] = TILE_SPAWN;
+    map[hallY - 3][10 + 8] = TILE_HORIVER_SPAWN;
+
+    // Items
+    map[hallY - 5][40] = TILE_FLASHLIGHT;
+    map[hallY + 3][50] = TILE_KEY;
+    map[hallY - 4][72] = TILE_VAPE;
+
+    // Bathroom exit
+    map[hallY][MAP_SIZE - 4] = TILE_BATHROOM_DOOR;
+
+    // Random closets around hallway / rooms (still deterministic due to seeded RNG)
+    for (let y = hallY - 15; y <= hallY + 15; y++) {
+      for (let x = 8; x <= MAP_SIZE - 8; x++) {
+        if (map[y][x] === TILE_FLOOR && rand() < 0.03) {
+          map[y][x] = TILE_CLOSET;
+        }
+      }
+    }
+  }
+
+  let player = { x: 0, y: 0, speed: 4 };
+  let horiver = { x: 0, y: 0, active: false, speed: 3.4 };
+  let keysPressed = {};
+
+  let hasFlashlight = false;
+  let hasKey = false;
+  let hasVape = false;
+  let alive = true;
+  let won = false;
+
+  let lastTime = 0;
+
+  let floorPattern = null;
+  let wallPattern = null;
+  imgDungeon.onload = () => {
+    floorPattern = ctx.createPattern(imgDungeon, "repeat");
+    wallPattern = ctx.createPattern(imgDungeon, "repeat");
+  };
+
+  function showStatus(text, duration = 2000) {
+    statusMessage.textContent = text;
+    statusMessage.classList.add("visible");
+    setTimeout(() => statusMessage.classList.remove("visible"), duration);
+  }
+
+  function findTile(type) {
+    for (let y = 0; y < MAP_SIZE; y++) {
+      for (let x = 0; x < MAP_SIZE; x++) {
+        if (map[y][x] === type) return { x, y };
+      }
+    }
+    return null;
+  }
+
+  function initPositions() {
+    const spawn = findTile(TILE_SPAWN) || { x: 3, y: Math.floor(MAP_SIZE / 2) };
+    player.x = spawn.x + 0.5;
+    player.y = spawn.y + 0.5;
+
+    const hSpawn = findTile(TILE_HORIVER_SPAWN) || { x: 15, y: Math.floor(MAP_SIZE / 2) };
+    horiver.x = hSpawn.x + 0.5;
+    horiver.y = hSpawn.y + 0.5;
+    horiver.active = false;
+  }
+
+  function resetState() {
+    hasFlashlight = false;
+    hasKey = false;
+    hasVape = false;
+    alive = true;
+    won = false;
+    gameOverOverlay.classList.add("hidden");
+  }
+
+  function startGame() {
+    createMap();
+    resetState();
+    initPositions();
+    lastTime = performance.now();
+    requestAnimationFrame(gameLoop);
+    showStatus("Find the flashlight, key, vape – then escape to the bathroom!");
+  }
+
+  window.addEventListener("keydown", (e) => {
+    if (["KeyW","KeyA","KeyS","KeyD"].includes(e.code)) e.preventDefault();
+    keysPressed[e.code] = true;
+  });
+  window.addEventListener("keyup", (e) => {
+    keysPressed[e.code] = false;
+  });
+
+  function tileAt(px, py) {
+    const tx = Math.floor(px);
+    const ty = Math.floor(py);
+    if (tx < 0 || tx >= MAP_SIZE || ty < 0 || ty >= MAP_SIZE) return TILE_WALL;
+    return map[ty][tx];
+  }
+
+  function isSolid(tile) {
+    return tile === TILE_WALL || tile === TILE_LOCKED_DOOR;
+  }
+
+  function update(dt) {
+    if (!alive || won) return;
+
+    let ix = 0, iy = 0;
+    if (keysPressed["KeyW"]) iy -= 1;
+    if (keysPressed["KeyS"]) iy += 1;
+    if (keysPressed["KeyA"]) ix -= 1;
+    if (keysPressed["KeyD"]) ix += 1;
+
+    const len = Math.hypot(ix, iy) || 1;
+    ix /= len; iy /= len;
+
+    const moveX = ix * player.speed * dt;
+    const moveY = iy * player.speed * dt;
+
+    let newX = player.x + moveX / TILE_SIZE;
+    if (!isSolid(tileAt(newX, player.y))) player.x = newX;
+
+    let newY = player.y + moveY / TILE_SIZE;
+    if (!isSolid(tileAt(player.x, newY))) player.y = newY;
+
+    const tx = Math.floor(player.x);
+    const ty = Math.floor(player.y);
+    let tile = tileAt(player.x, player.y);
+
+    if (tile === TILE_FLASHLIGHT) {
+      hasFlashlight = true;
+      map[ty][tx] = TILE_FLOOR;
+      sItemPickup.currentTime = 0; sItemPickup.play().catch(() => {});
+      showStatus("You picked up the FLASHLIGHT. The fog trembles.");
+    }
+    if (tile === TILE_KEY) {
+      hasKey = true;
+      map[ty][tx] = TILE_FLOOR;
+      sItemPickup.currentTime = 0; sItemPickup.play().catch(() => {});
+      showStatus("You picked up a KEY. Some doors might open now.");
+    }
+    if (tile === TILE_VAPE) {
+      hasVape = true;
+      map[ty][tx] = TILE_FLOOR;
+      sItemPickup.currentTime = 0; sItemPickup.play().catch(() => {});
+      showStatus("You found the sacred VAPE. Truly powerful.");
+      horiver.active = true;
     }
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawMaze();
-      drawPlayer();
+    // Open locked door with key
+    if (tile === TILE_LOCKED_DOOR && hasKey) {
+      map[ty][tx] = TILE_FLOOR;
+      sDoorOpen.currentTime = 0; sDoorOpen.play().catch(() => {});
+      showStatus("The key fits. The door opens with a cursed creak.");
     }
 
-    function canMoveTo(x, y) {
-      if (x < 0 || y < 0 || x >= cols || y >= rows) return false;
-      return maze[y][x] !== 1;
-    }
-
-    function checkWin() {
-      if (maze[player.y][player.x] === 2 && !gameWon) {
-        gameWon = true;
-        messageEl.textContent = "Tandri er níðingur";
+    // Bathroom exit
+    if (tile === TILE_BATHROOM_DOOR) {
+      if (hasFlashlight && hasKey && hasVape) {
+        won = true;
+        handleWin();
+      } else {
+        showStatus("You need the flashlight, key AND vape before you can escape!", 2500);
       }
     }
 
-    function handleKey(e) {
-      if (gameWon) return;
+    // Horiver AI
+    if (horiver.active) {
+      const dx = player.x - horiver.x;
+      const dy = player.y - horiver.y;
+      const dist = Math.hypot(dx, dy) || 1;
+      const hx = (dx / dist) * horiver.speed * dt / TILE_SIZE;
+      const hy = (dy / dist) * horiver.speed * dt / TILE_SIZE;
 
-      let newX = player.x;
-      let newY = player.y;
+      let hxNew = horiver.x + hx;
+      if (!isSolid(tileAt(hxNew, horiver.y))) horiver.x = hxNew;
 
-      const key = e.key.toLowerCase();
-      if (key === 'w') newY--;
-      if (key === 's') newY++;
-      if (key === 'a') newX--;
-      if (key === 'd') newX++;
+      let hyNew = horiver.y + hy;
+      if (!isSolid(tileAt(horiver.x, hyNew))) horiver.y = hyNew;
 
-      if (canMoveTo(newX, newY)) {
-        player.x = newX;
-        player.y = newY;
-        draw();
-        checkWin();
+      const playerTile = tileAt(player.x, player.y);
+      const safeInCloset = playerTile === TILE_CLOSET;
+
+      if (!safeInCloset) {
+        const killDist = 0.4;
+        if (Math.abs(player.x - horiver.x) < killDist &&
+            Math.abs(player.y - horiver.y) < killDist) {
+          handleDeath();
+        }
+      }
+    } else {
+      const distToHoriver = Math.hypot(player.x - horiver.x, player.y - horiver.y);
+      if (distToHoriver < 10) {
+        horiver.active = true;
+        showStatus("You hear footsteps. Hóriver knows you're here.");
+      }
+    }
+  }
+
+  function handleDeath() {
+    alive = false;
+    gameOverTitle.textContent = "YOU DIED";
+    gameOverSub.textContent =
+      "Hóriver caught you skulking through his lair. Maybe try hiding in closets, grabbing the flashlight, and not stealing his vape so loudly.";
+    gameOverOverlay.style.backgroundImage = "url('images/horiver-jumpscare.png')";
+    gameOverOverlay.classList.remove("hidden");
+    sJumpscare.currentTime = 0; sJumpscare.play().catch(() => {});
+    sDeathScream.currentTime = 0; sDeathScream.play().catch(() => {});
+  }
+
+  function handleWin() {
+    gameOverTitle.textContent = "YOU ESCAPED";
+    gameOverSub.textContent =
+      "You grabbed the flashlight, the key, and the vape, then found the legendary bathroom of Communism Iceland. Hóriver screams in the distance as you slam the door.";
+    gameOverOverlay.style.backgroundImage = "url('images/horiver-lair.png')";
+    gameOverOverlay.classList.remove("hidden");
+    sToiletFlush.currentTime = 0; sToiletFlush.play().catch(() => {});
+    sWin.currentTime = 0; sWin.play().catch(() => {});
+  }
+
+  restartBtn.addEventListener("click", () => {
+    sMenuClick.currentTime = 0; sMenuClick.play().catch(() => {});
+    createMap();
+    resetState();
+    initPositions();
+    lastTime = performance.now();
+    requestAnimationFrame(gameLoop);
+  });
+
+  function drawTile(tile, x, y) {
+    const px = x * TILE_SIZE;
+    const py = y * TILE_SIZE;
+
+    if (tile === TILE_FLOOR || tile === TILE_SPAWN || tile === TILE_HORIVER_SPAWN) {
+      if (floorPattern) {
+        ctx.fillStyle = floorPattern;
+        ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+        ctx.fillStyle = "rgba(0,0,0,0.4)";
+        ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+      } else {
+        ctx.fillStyle = "#141016";
+        ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+      }
+    } else if (tile === TILE_WALL) {
+      if (wallPattern) {
+        ctx.fillStyle = wallPattern;
+        ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+        ctx.fillStyle = "rgba(0,0,0,0.2)";
+        ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+      } else {
+        ctx.fillStyle = "#251a23";
+        ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+      }
+    } else if (tile === TILE_CLOSET) {
+      ctx.fillStyle = "#2b1a0b";
+      ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+      ctx.fillStyle = "#3a2410";
+      ctx.fillRect(px + 6, py + 2, TILE_SIZE - 12, TILE_SIZE - 4);
+      ctx.fillStyle = "#fddf62";
+      ctx.fillRect(px + TILE_SIZE/2 - 1, py + TILE_SIZE/2, 2, 4);
+    } else if (tile === TILE_LOCKED_DOOR) {
+      ctx.fillStyle = "#3e2611";
+      ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+      ctx.fillStyle = "#fddf62";
+      ctx.fillRect(px + TILE_SIZE/2 - 1, py + TILE_SIZE/2 - 2, 2, 4);
+    } else if (tile === TILE_FLASHLIGHT) {
+      if (imgFlashlight.complete && imgFlashlight.naturalWidth > 0) {
+        ctx.drawImage(imgFlashlight, px, py, TILE_SIZE, TILE_SIZE);
+      } else {
+        ctx.fillStyle = "#ffe88a";
+        ctx.fillRect(px + 10, py + 8, 12, 16);
+      }
+    } else if (tile === TILE_KEY) {
+      if (imgKey.complete && imgKey.naturalWidth > 0) {
+        ctx.drawImage(imgKey, px, py, TILE_SIZE, TILE_SIZE);
+      } else {
+        ctx.fillStyle = "#ffd95f";
+        ctx.fillRect(px + 8, py + 12, 16, 8);
+      }
+    } else if (tile === TILE_VAPE) {
+      if (imgVape.complete && imgVape.naturalWidth > 0) {
+        ctx.drawImage(imgVape, px, py, TILE_SIZE, TILE_SIZE);
+      } else {
+        ctx.fillStyle = "#9be7ff";
+        ctx.fillRect(px + 12, py + 6, 8, 18);
+      }
+    } else if (tile === TILE_BATHROOM_DOOR) {
+      ctx.fillStyle = "#1a2433";
+      ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+      ctx.fillStyle = "#fddf62";
+      ctx.fillRect(px + TILE_SIZE/2 - 1, py + TILE_SIZE/2 - 2, 2, 4);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "10px sans-serif";
+      ctx.fillText("WC", px + 6, py + 13);
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const camX = player.x - VIEW_TILES_X / 2;
+    const camY = player.y - VIEW_TILES_Y / 2;
+
+    const startX = Math.floor(camX);
+    const startY = Math.floor(camY);
+
+    for (let y = 0; y < VIEW_TILES_Y + 2; y++) {
+      for (let x = 0; x < VIEW_TILES_X + 2; x++) {
+        const tx = startX + x;
+        const ty = startY + y;
+        if (tx < 0 || tx >= MAP_SIZE || ty < 0 || ty >= MAP_SIZE) {
+          ctx.fillStyle = "#000";
+          ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+          continue;
+        }
+        const tile = map[ty][tx];
+        drawTile(tile, x, y);
       }
     }
 
-    window.addEventListener('keydown', handleKey);
+    const px = (player.x - camX) * TILE_SIZE;
+    const py = (player.y - camY) * TILE_SIZE;
+    if (imgPlayer.complete && imgPlayer.naturalWidth > 0) {
+      ctx.drawImage(imgPlayer, px - TILE_SIZE/2, py - TILE_SIZE/2, TILE_SIZE, TILE_SIZE);
+    } else {
+      ctx.fillStyle = "#fddf62";
+      ctx.beginPath();
+      ctx.arc(px, py, TILE_SIZE*0.35, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    const hx = (horiver.x - camX) * TILE_SIZE;
+    const hy = (horiver.y - camY) * TILE_SIZE;
+    if (imgHoriver.complete && imgHoriver.naturalWidth > 0) {
+      const size = TILE_SIZE * 1.5;
+      ctx.drawImage(imgHoriver, hx - size/2, hy - size/2, size, size);
+    } else {
+      ctx.fillStyle = "#b90035";
+      ctx.beginPath();
+      ctx.arc(hx, hy, TILE_SIZE*0.45, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // Fog + flashlight (thick fog, larger radius with flashlight)
+    const flashlightRadius = hasFlashlight ? 220 : 130;
+
+    ctx.save();
+    ctx.fillStyle = "rgba(0,0,0,0.96)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const gradient = ctx.createRadialGradient(
+      px, py, flashlightRadius * 0.1,
+      px, py, flashlightRadius
+    );
+    gradient.addColorStop(0, "rgba(0,0,0,0)");
+    gradient.addColorStop(0.6, "rgba(0,0,0,0.5)");
+    gradient.addColorStop(1, "rgba(0,0,0,0.98)");
+
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(px, py, flashlightRadius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    hud.innerHTML =
+      `FLASHLIGHT: <strong>${hasFlashlight ? "YES" : "NO"}</strong> &nbsp;|&nbsp; ` +
+      `KEY: <strong>${hasKey ? "YES" : "NO"}</strong> &nbsp;|&nbsp; ` +
+      `VAPE: <strong>${hasVape ? "YES" : "NO"}</strong>`;
+  }
+
+  function gameLoop(timestamp) {
+    const dtMs = timestamp - lastTime;
+    lastTime = timestamp;
+    const dt = dtMs / 16.67; // ~1 at 60fps
+
+    update(dt);
     draw();
-  </script>
+
+    if (!alive || won) return;
+    requestAnimationFrame(gameLoop);
+  }
+</script>
 </body>
 </html>
