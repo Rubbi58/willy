@@ -786,13 +786,42 @@
       }
     });
 
-    enterBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      safePlay(sounds.menuClick);
-      startMusicOnce();
-      welcomeOverlay.classList.remove("active");
-      resetGame();
-      safePlay(sounds.start);
+    function startGameFromMenu() {
+  if (menuStage !== 2) return;      // Only start from Horiver title screen
+
+  menuStage = 3;
+
+  // Hide lair screen, show canvas
+  horiverTitleScreen.classList.add("hidden");
+  canvas.classList.remove("hidden");
+
+  // Sounds (wrapped in try just in case)
+  try {
+    sStart.currentTime = 0;
+    sStart.play();
+  } catch (e) {}
+
+  try {
+    bgMusic.volume = 0.7;
+    bgMusic.play();
+  } catch (e) {}
+
+  startGame();
+}
+
+// Mouse click on Enter button
+enterBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  startGameFromMenu();
+});
+
+// Pressing Enter key on keyboard also starts
+window.addEventListener("keydown", (e) => {
+  if (e.code === "Enter" && menuStage === 2) {
+    e.preventDefault();
+    startGameFromMenu();
+  }
+
     });
 
     document.getElementById("retryBtn").addEventListener("click", () => {
