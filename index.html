@@ -1,955 +1,915 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Hubios Communism Party – Hóriver's Lair (Prototype)</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: #050105;
-      color: #fddf62;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      overflow: hidden;
-    }
-
-    #game-wrapper {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding-top: 20px;
-      color: #fddf62;
-    }
-
-    h1 {
-      letter-spacing: 0.2em;
-      font-size: 20px;
-      text-transform: uppercase;
-      text-align: center;
-      margin-bottom: 4px;
-    }
-
-    #subtitle {
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-      text-align: center;
-    }
-
-    #game-frame {
-      border: 3px solid #fddf62;
-      width: 960px;
-      height: 640px;
-      position: relative;
-      background: #020003;
-      overflow: hidden;
-    }
-
-    canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      background: #050107;
-    }
-
-    #footer-text {
-      margin-top: 8px;
-      font-size: 11px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      text-align: center;
-    }
-
-    .hidden { display: none; }
-
-    /* MENU / INTRO */
-
-    #menu-overlay,
-    #title-overlay {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, rgba(5,1,7,0.9), #050105 70%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-      text-align: center;
-      cursor: pointer;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    #menu-text { font-size: 18px; max-width: 720px; line-height: 1.5; }
-
-    #menu-hint {
-      font-size: 12px;
-      opacity: 0.7;
-      margin-top: 10px;
-    }
-
-    #ready-text {
-      font-size: 24px;
-      font-weight: 600;
-    }
-
-    #horiver-title-screen {
-      position: absolute;
-      inset: 0;
-      background: #050105;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      text-align: center;
-    }
-
-    #horiver-title-screen img {
-      max-width: 420px;
-      max-height: 260px;
-      object-fit: contain;
-      border-radius: 12px;
-      border: 2px solid #fddf62;
-      background: #000;
-    }
-
-    #horiver-main-title {
-      font-size: 28px;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-    }
-
-    #horiver-subtitle {
-      font-size: 16px;
-      opacity: 0.9;
-    }
-
-    .btn {
-      border: 2px solid #fddf62;
-      padding: 10px 28px;
-      border-radius: 999px;
-      font-size: 15px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      background: transparent;
-      color: #fddf62;
-      cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
-    }
-    .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 12px rgba(253,223,98,0.35);
-      background: rgba(253,223,98,0.08);
-    }
-    .btn:active { transform: translateY(0); box-shadow: none; }
-
-    /* HUD */
-
-    #hud {
-      position: absolute;
-      top: 10px;
-      left: 12px;
-      font-size: 12px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      text-shadow: 0 0 4px #000;
-      pointer-events: none;
-    }
-
-    #status-message {
-      position: absolute;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 14px;
-      padding: 6px 12px;
-      background: rgba(5,1,7,0.85);
-      border-radius: 999px;
-      border: 1px solid rgba(253,223,98,0.4);
-      box-shadow: 0 0 12px rgba(0,0,0,0.8);
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-    #status-message.visible { opacity: 1; }
-
-    #game-over-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      text-align: center;
-      padding: 20px;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: contain;
-      background-color: rgba(5,1,7,0.97);
-    }
-    #game-over-overlay.hidden { display: none; }
-
-    #game-over-title {
-      font-size: 26px;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      text-shadow: 0 0 6px #000;
-    }
-
-    #game-over-sub {
-      font-size: 15px;
-      max-width: 620px;
-      line-height: 1.5;
-      text-shadow: 0 0 4px #000;
-    }
-
-    @media (max-width: 980px) {
-      #game-frame {
-        width: 100vw;
-        height: calc(100vw * 2/3);
-        max-height: 640px;
-      }
-    }
-  </style>
+ <meta charset="UTF-8" />
+ <title>Communism Party – Hóriver's Lair (Prototype)</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <style>
+ * {
+ box-sizing: border-box;
+ margin: 0;
+ padding: 0;
+ font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+ }
+ body {
+ background: #050104;
+ color: #f7e3c8;
+ overflow: hidden;
+ }
+ h1 {
+ margin-top: 10px;
+ text-align: center;
+ letter-spacing: 0.18em;
+ text-transform: uppercase;
+ font-size: 18px;
+ color: #ffdd88;
+ }
+ #subtitle {
+ text-align: center;
+ font-size: 13px;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ margin-top: 4px;
+ color: #ffbb66;
+ }
+ #game-wrapper {
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ justify-content: center;
+ height: calc(100vh - 90px);
+ }
+ canvas {
+ border: 2px solid #ffcc66;
+ background: #000;
+ image-rendering: pixelated;
+ box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+ }
+ #controls {
+ margin-top: 8px;
+ font-size: 13px;
+ opacity: 0.9;
+ color: #ffe6bf;
+ text-align: center;
+ }
+ #interactionPrompt {
+ margin-top: 4px;
+ font-size: 13px;
+ text-align: center;
+ color: #ffdd88;
+ min-height: 18px;
+ }
+ .overlay {
+ position: fixed;
+ inset: 0;
+ display: none;
+ align-items: center;
+ justify-content: center;
+ background: rgba(0, 0, 0, 0.88);
+ z-index: 40;
+ }
+ .overlay.active {
+ display: flex;
+ }
+ .overlay-card {
+ border-radius: 1.4rem;
+ border: 2px solid #ffcc66;
+ background: radial-gradient(circle at top, #4b0000 0, #050104 60%);
+ padding: 1.6rem 2rem 1.8rem;
+ max-width: 480px;
+ text-align: center;
+ color: #ffe6bf;
+ box-shadow: 0 26px 70px rgba(0, 0, 0, 0.9);
+ }
+ .overlay-card img {
+ max-width: 260px;
+ image-rendering: pixelated;
+ border-radius: 0.7rem;
+ margin-bottom: 0.9rem;
+ }
+ .overlay-title {
+ font-size: 1.4rem;
+ letter-spacing: 0.16em;
+ text-transform: uppercase;
+ color: #ffdd88;
+ margin-bottom: 0.5rem;
+ }
+ .overlay-sub {
+ font-size: 0.92rem;
+ margin-bottom: 1.1rem;
+ }
+ .btn {
+ cursor: pointer;
+ border-radius: 999px;
+ padding: 0.6rem 1.5rem;
+ font-size: 0.85rem;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ border: none;
+ margin: 0 0.4rem;
+ }
+ .btn-primary {
+ background: linear-gradient(135deg, #ffcc66, #ff4848);
+ color: #3b0000;
+ font-weight: 800;
+ box-shadow: 0 14px 28px rgba(0, 0, 0, 0.7);
+ }
+ .btn-primary:hover {
+ filter: brightness(1.06);
+ }
+ #alertBanner {
+ position: fixed;
+ left: 50%;
+ top: 10%;
+ transform: translateX(-50%);
+ padding: 0.5rem 1.1rem;
+ border-radius: 999px;
+ border: 1px solid #ff4444;
+ background: rgba(60, 0, 0, 0.93);
+ color: #ffdddd;
+ font-size: 0.82rem;
+ letter-spacing: 0.16em;
+ text-transform: uppercase;
+ text-align: center;
+ display: none;
+ z-index: 25;
+ box-shadow: 0 10px 24px rgba(0, 0, 0, 0.8);
+ }
+ #welcomeOverlay img {
+ max-width: 280px;
+ }
+ #welcomeHint {
+ margin-top: 0.8rem;
+ font-size: 0.8rem;
+ opacity: 0.7;
+ }
+ @media (max-width: 900px) {
+ #game-wrapper {
+ transform: scale(0.85);
+ }
+ .overlay-card {
+ margin: 0 1rem;
+ padding-inline: 1.4rem;
+ }
+ }
+ </style>
 </head>
 <body>
-<div id="game-wrapper">
-  <h1>HÓRIVER'S LAIR – LEVEL 1</h1>
-  <div id="subtitle">
-    MISSION: FIND THE FLASHLIGHT, KEY, VAPE AND BATHROOM IN HÓRIVER'S ENDLESS CASTLE
-  </div>
-
-  <div id="game-frame">
-    <!-- Intro -->
-    <div id="menu-overlay">
-      <div id="menu-text"></div>
-      <div id="menu-hint">Click anywhere to continue</div>
-    </div>
-
-    <div id="title-overlay" class="hidden">
-      <div id="ready-text"></div>
-      <div id="menu-hint">Click if you dare...</div>
-    </div>
-
-    <div id="horiver-title-screen" class="hidden">
-      <img id="horiver-lair-img" src="images/horiver-lair.png" alt="Hóriver's Lair" />
-      <div id="horiver-main-title">HORIVER'S LAIR</div>
-      <div id="horiver-subtitle">Enter</div>
-      <button id="enter-btn" class="btn">Enter</button>
-    </div>
-
-    <!-- Game canvas -->
-    <canvas id="gameCanvas" width="960" height="640" class="hidden"></canvas>
-
-    <!-- HUD -->
-    <div id="hud"></div>
-    <div id="status-message"></div>
-
-    <!-- Game over / win -->
-    <div id="game-over-overlay" class="hidden">
-      <div id="game-over-title"></div>
-      <div id="game-over-sub"></div>
-      <button id="restart-btn" class="btn">Restart from Lair Entrance</button>
-    </div>
-  </div>
-
-  <div id="footer-text">
-    Move with <strong>W A S D</strong>. Closets = safe. Hóriver kills on contact. Fog is thick – use the flashlight. (Press F to toggle fog while testing)
-  </div>
-</div>
-
-<!-- Background music -->
-<audio id="bgMusic" src="sounds/backg-music.mp3" loop></audio>
-
-<script>
-"use strict";
-
-/*************** IMAGES & SOUNDS ***************/
-const imgPlayer = new Image();
-imgPlayer.src = "images/player.png";
-
-const imgHoriver = new Image();
-imgHoriver.src = "images/horiver-character.png";
-
-const imgFlashlight = new Image();
-imgFlashlight.src = "images/pixel-flashlight.png";
-
-const imgKey = new Image();
-imgKey.src = "images/key pixel.png";
-
-const imgVape = new Image();
-imgVape.src = "images/vape pixel.png";
-
-const imgJumpscare = new Image();
-imgJumpscare.src = "images/horiver-jumpscare.png";
-
-const imgLair = new Image();
-imgLair.src = "images/horiver-lair.png";
-
-const imgFurniture = new Image();
-imgFurniture.src = "images/furniture.png";
-
-const sMenuClick = new Audio("sounds/menu-click.mp3");
-const sStart = new Audio("sounds/start-sound.mp3");
-const sItemPickup = new Audio("sounds/item-pickup.mp3");
-const sDoorOpen = new Audio("sounds/door-open.mp3");
-const sDeathScream = new Audio("sounds/horiver-death-scream.mp3");
-const sJumpscare = new Audio("sounds/jumpscare.mp3");
-const sToiletFlush = new Audio("sounds/toilet-flush.mp3");
-const sWin = new Audio("sounds/win.mp3");
-
-const bgMusic = document.getElementById("bgMusic");
-
-/*************** INTRO / MENUS ***************/
-const introLines = [
-  "Welcome to Hubios communism party game.",
-  "Your mission is to save Communism Iceland,",
-  "but first, you need to defeat some foes...",
-  "now you'll enter... Horivers lair!!!"
-];
-const readyLine = "Are you ready?";
-
-const menuOverlay = document.getElementById("menu-overlay");
-const menuTextEl = document.getElementById("menu-text");
-const titleOverlay = document.getElementById("title-overlay");
-const readyTextEl = document.getElementById("ready-text");
-const horiverTitleScreen = document.getElementById("horiver-title-screen");
-const enterBtn = document.getElementById("enter-btn");
-const canvas = document.getElementById("gameCanvas");
-const hud = document.getElementById("hud");
-const statusMessage = document.getElementById("status-message");
-const gameOverOverlay = document.getElementById("game-over-overlay");
-const gameOverTitle = document.getElementById("game-over-title");
-const gameOverSub = document.getElementById("game-over-sub");
-const restartBtn = document.getElementById("restart-btn");
-
-let introIndex = 0;
-let typing = false;
-let menuStage = 0; // 0=intro,1=ready,2=lair screen,3=game
-
-function typeText(el, text, cb, speed = 32) {
-  el.textContent = "";
-  let i = 0;
-  typing = true;
-  const interval = setInterval(() => {
-    el.textContent += text[i];
-    i++;
-    if (i >= text.length) {
-      clearInterval(interval);
-      typing = false;
-      if (cb) cb();
-    }
-  }, speed);
-}
-
-function showNextIntro() {
-  if (introIndex < introLines.length) {
-    typeText(menuTextEl, introLines[introIndex], null);
-    introIndex++;
-  } else {
-    menuStage = 1;
-    menuOverlay.classList.add("hidden");
-    titleOverlay.classList.remove("hidden");
-    typeText(readyTextEl, readyLine, null, 45);
-  }
-}
-
-menuOverlay.addEventListener("click", () => {
-  if (typing) return;
-  try { sMenuClick.currentTime = 0; sMenuClick.play(); } catch(e) {}
-  if (menuStage === 0) showNextIntro();
-});
-
-titleOverlay.addEventListener("click", () => {
-  if (typing) return;
-  try { sMenuClick.currentTime = 0; sMenuClick.play(); } catch(e) {}
-  if (menuStage === 1) {
-    titleOverlay.classList.add("hidden");
-    horiverTitleScreen.classList.remove("hidden");
-    menuStage = 2;
-  }
-});
-
-function startGameFromMenu() {
-  if (menuStage !== 2) return;
-  menuStage = 3;
-
-  horiverTitleScreen.classList.add("hidden");
-  canvas.classList.remove("hidden");
-
-  try { sStart.currentTime = 0; sStart.play(); } catch(e) {}
-  try { bgMusic.volume = 0.7; bgMusic.play(); } catch(e) {}
-
-  startGame();
-}
-
-enterBtn.addEventListener("click", (e) => {
-  e.preventDefault();
-  startGameFromMenu();
-});
-
-/*************** GAME CONSTANTS ***************/
-const ctx = canvas.getContext("2d");
-
-const TILE_SIZE = 32;
-const MAP_W = 30;
-const MAP_H = 30;
-
-const TILE_FLOOR = 0;
-const TILE_WALL = 1;
-const TILE_CLOSET = 2;
-const TILE_LOCKED_DOOR = 3;
-const TILE_FLASHLIGHT = 4;
-const TILE_KEY = 5;
-const TILE_VAPE = 6;
-const TILE_BATHROOM = 7;
-const TILE_FURN1 = 8;
-const TILE_FURN2 = 9;
-const TILE_FURN3 = 10;
-
-let map = [];
-let player = { x: 0, y: 0, speed: 140 }; // pixels
-let horiver = { x: 0, y: 0, speed: 110, active: false };
-
-let hasFlashlight = false;
-let hasKey = false;
-let hasVape = false;
-let alive = true;
-let won = false;
-
-let keysPressed = {};
-let debugNoFog = false;
-let lastTime = 0;
-
-/*************** LEVEL LAYOUT (30x30) ***************/
-/*
- Legend:
- # = wall
- . = floor
- C = closet (safe)
- D = locked door
- F = flashlight
- K = key
- V = vape
- B = bathroom (exit)
- S = player spawn
- H = Horiver spawn
- 1,2,3 = different furniture pieces
-*/
-const levelLayout = [
-"##############################",
-"#S.....C.....####.....C.....#",
-"#......#.....#..1.....#.....#",
-"#..F...#.....#........#..K..#",
-"#......#.....#######..#.....#",
-"#......#..............#.....#",
-"#..C...####..####..####..C..#",
-"#.........................1.#",
-"#####..######..######..#####.",
-"#..........................#.",
-"#..2.......................#.",
-"#..........#########.......#.",
-"#..........#.....C.#.......#.",
-"#....V.....#.......#.......#.",
-"#..........#.......#.......#.",
-"#..........#########.......#.",
-"#..........................#.",
-"#..C.......................#.",
-"#..........................#.",
-"############..##############.",
-"#...........D..............#.",
-"#...........#..............#.",
-"#...........#..............#.",
-"#...........#..............#.",
-"#.....1.....#......C.......#.",
-"#...........#..............#.",
-"#.....C.....#...........B..#.",
-"#...........#..............#.",
-"#...........H..............#.",
-"##############################"
-];
-
-/*************** MAP PARSING ***************/
-function parseMap() {
-  map = new Array(MAP_H).fill(null).map(
-    () => new Array(MAP_W).fill(TILE_FLOOR)
-  );
-  let spawnFound = false;
-  let horiverFound = false;
-
-  for (let y = 0; y < MAP_H; y++) {
-    const row = levelLayout[y] || "";
-    for (let x = 0; x < MAP_W; x++) {
-      const ch = row[x] || "#";
-      let tile = TILE_FLOOR;
-
-      switch (ch) {
-        case "#": tile = TILE_WALL; break;
-        case ".": tile = TILE_FLOOR; break;
-        case "C": tile = TILE_CLOSET; break;
-        case "D": tile = TILE_LOCKED_DOOR; break;
-        case "F": tile = TILE_FLASHLIGHT; break;
-        case "K": tile = TILE_KEY; break;
-        case "V": tile = TILE_VAPE; break;
-        case "B": tile = TILE_BATHROOM; break;
-        case "1": tile = TILE_FURN1; break;
-        case "2": tile = TILE_FURN2; break;
-        case "3": tile = TILE_FURN3; break;
-        case "S":
-          tile = TILE_FLOOR;
-          if (!spawnFound) {
-            player.x = (x + 0.5) * TILE_SIZE;
-            player.y = (y + 0.5) * TILE_SIZE;
-            spawnFound = true;
-          }
-          break;
-        case "H":
-          tile = TILE_FLOOR;
-          if (!horiverFound) {
-            horiver.x = (x + 0.5) * TILE_SIZE;
-            horiver.y = (y + 0.5) * TILE_SIZE;
-            horiverFound = true;
-          }
-          break;
-        default:
-          tile = TILE_FLOOR;
-      }
-      map[y][x] = tile;
-    }
-  }
-
-  if (!spawnFound) {
-    player.x = 2.5 * TILE_SIZE;
-    player.y = 2.5 * TILE_SIZE;
-  }
-}
-
-/*************** STATE RESET ***************/
-function resetState() {
-  hasFlashlight = false;
-  hasKey = false;
-  hasVape = false;
-  alive = true;
-  won = false;
-  horiver.active = false;
-  gameOverOverlay.classList.add("hidden");
-}
-
-/*************** STATUS MESSAGES ***************/
-function showStatus(text, duration = 2000) {
-  statusMessage.textContent = text;
-  statusMessage.classList.add("visible");
-  setTimeout(() => statusMessage.classList.remove("visible"), duration);
-}
-
-/*************** GAME START ***************/
-function startGame() {
-  parseMap();
-  resetState();
-  lastTime = performance.now();
-  showStatus("Find the flashlight, key, vape – then escape to the bathroom!");
-  requestAnimationFrame(gameLoop);
-}
-
-/*************** INPUT ***************/
-function handleKeyDown(e) {
-  if (["KeyW","KeyA","KeyS","KeyD","Enter","KeyF"].includes(e.code)) {
-    e.preventDefault();
-  }
-
-  if (menuStage === 2 && e.code === "Enter") {
-    startGameFromMenu();
-    return;
-  }
-
-  if (e.code === "KeyF") {
-    debugNoFog = !debugNoFog;
-    return;
-  }
-
-  keysPressed[e.code] = true;
-}
-
-function handleKeyUp(e) {
-  keysPressed[e.code] = false;
-}
-
-window.addEventListener("keydown", handleKeyDown);
-window.addEventListener("keyup", handleKeyUp);
-
-/*************** TILE HELPERS ***************/
-function tileAtPixel(px, py) {
-  const tx = Math.floor(px / TILE_SIZE);
-  const ty = Math.floor(py / TILE_SIZE);
-  if (tx < 0 || tx >= MAP_W || ty < 0 || ty >= MAP_H) return TILE_WALL;
-  return map[ty][tx];
-}
-
-function setTileAtPixel(px, py, tile) {
-  const tx = Math.floor(px / TILE_SIZE);
-  const ty = Math.floor(py / TILE_SIZE);
-  if (tx < 0 || tx >= MAP_W || ty < 0 || ty >= MAP_H) return;
-  map[ty][tx] = tile;
-}
-
-function isSolidTile(tile) {
-  return tile === TILE_WALL ||
-         tile === TILE_LOCKED_DOOR ||
-         tile === TILE_FURN1 ||
-         tile === TILE_FURN2 ||
-         tile === TILE_FURN3;
-}
-
-function isSolidAtPixel(px, py) {
-  return isSolidTile(tileAtPixel(px, py));
-}
-
-/*************** UPDATE LOGIC ***************/
-function update(dt) {
-  if (!alive || won) return;
-  if (dt > 0.1) dt = 0.1;
-
-  // Player movement
-  let ix = 0, iy = 0;
-  if (keysPressed["KeyW"]) iy -= 1;
-  if (keysPressed["KeyS"]) iy += 1;
-  if (keysPressed["KeyA"]) ix -= 1;
-  if (keysPressed["KeyD"]) ix += 1;
-
-  const len = Math.hypot(ix, iy) || 1;
-  ix /= len; iy /= len;
-
-  const moveX = ix * player.speed * dt;
-  const moveY = iy * player.speed * dt;
-
-  let newX = player.x + moveX;
-  if (!isSolidAtPixel(newX, player.y)) player.x = newX;
-
-  let newY = player.y + moveY;
-  if (!isSolidAtPixel(player.x, newY)) player.y = newY;
-
-  const centerTile = tileAtPixel(player.x, player.y);
-
-  // Items
-  if (centerTile === TILE_FLASHLIGHT) {
-    hasFlashlight = true;
-    setTileAtPixel(player.x, player.y, TILE_FLOOR);
-    try { sItemPickup.currentTime = 0; sItemPickup.play(); } catch(e) {}
-    showStatus("You picked up the FLASHLIGHT. The fog trembles.");
-  }
-
-  if (centerTile === TILE_KEY) {
-    hasKey = true;
-    setTileAtPixel(player.x, player.y, TILE_FLOOR);
-    try { sItemPickup.currentTime = 0; sItemPickup.play(); } catch(e) {}
-    showStatus("You picked up a KEY. Some doors might open now.");
-  }
-
-  if (centerTile === TILE_VAPE) {
-    hasVape = true;
-    setTileAtPixel(player.x, player.y, TILE_FLOOR);
-    try { sItemPickup.currentTime = 0; sItemPickup.play(); } catch(e) {}
-    showStatus("You found the sacred VAPE. Truly powerful.");
-    horiver.active = true;
-  }
-
-  // Door
-  if (centerTile === TILE_LOCKED_DOOR && hasKey) {
-    setTileAtPixel(player.x, player.y, TILE_FLOOR);
-    try { sDoorOpen.currentTime = 0; sDoorOpen.play(); } catch(e) {}
-    showStatus("The key fits. The door opens with a cursed creak.");
-  }
-
-  // Bathroom exit
-  if (centerTile === TILE_BATHROOM) {
-    if (hasFlashlight && hasKey && hasVape) {
-      won = true;
-      handleWin();
-    } else {
-      showStatus("You need the flashlight, key AND vape before you can escape!", 2500);
-    }
-  }
-
-  // Activate Horiver if close
-  const distToHoriver = Math.hypot(player.x - horiver.x, player.y - horiver.y);
-  if (!horiver.active && distToHoriver < 200) {
-    horiver.active = true;
-    showStatus("You hear footsteps. Hóriver knows you're here.");
-  }
-
-  // Horiver AI
-  if (horiver.active) {
-    const dx = player.x - horiver.x;
-    const dy = player.y - horiver.y;
-    const dist = Math.hypot(dx, dy) || 1;
-    const vx = (dx / dist) * horiver.speed * dt;
-    const vy = (dy / dist) * horiver.speed * dt;
-
-    let hxNew = horiver.x + vx;
-    if (!isSolidAtPixel(hxNew, horiver.y)) horiver.x = hxNew;
-
-    let hyNew = horiver.y + vy;
-    if (!isSolidAtPixel(horiver.x, hyNew)) horiver.y = hyNew;
-
-    const tileUnderPlayer = centerTile;
-    const safeInCloset = tileUnderPlayer === TILE_CLOSET;
-
-    if (!safeInCloset && Math.hypot(player.x - horiver.x, player.y - horiver.y) < 20) {
-      handleDeath();
-    }
-  }
-}
-
-/*************** DEATH / WIN ***************/
-function handleDeath() {
-  alive = false;
-  gameOverTitle.textContent = "YOU DIED";
-  gameOverSub.textContent =
-    "Hóriver caught you skulking through his lair. Maybe try hiding in closets, grabbing the flashlight, and not stealing his vape so loudly.";
-  gameOverOverlay.style.backgroundImage = "url('images/horiver-jumpscare.png')";
-  gameOverOverlay.classList.remove("hidden");
-  try { sJumpscare.currentTime = 0; sJumpscare.play(); } catch(e) {}
-  try { sDeathScream.currentTime = 0; sDeathScream.play(); } catch(e) {}
-}
-
-function handleWin() {
-  gameOverTitle.textContent = "YOU ESCAPED";
-  gameOverSub.textContent =
-    "You grabbed the flashlight, the key, and the vape, then found the legendary bathroom of Communism Iceland. Hóriver screams in the distance as you slam the door.";
-  gameOverOverlay.style.backgroundImage = "url('images/horiver-lair.png')";
-  gameOverOverlay.classList.remove("hidden");
-  try { sToiletFlush.currentTime = 0; sToiletFlush.play(); } catch(e) {}
-  try { sWin.currentTime = 0; sWin.play(); } catch(e) {}
-}
-
-restartBtn.addEventListener("click", () => {
-  try { sMenuClick.currentTime = 0; sMenuClick.play(); } catch(e) {}
-  startGame();
-});
-
-/*************** DRAWING ***************/
-const FURN_TILE_SIZE = 16; // furniture.png tile size
-
-function drawFurniture(index, px, py) {
-  if (!imgFurniture.complete || !imgFurniture.naturalWidth) {
-    // fallback simple block
-    ctx.fillStyle = "#4c3b2a";
-    ctx.fillRect(px + 4, py + 4, TILE_SIZE - 8, TILE_SIZE - 8);
-    return;
-  }
-  const cols = Math.max(1, Math.floor(imgFurniture.naturalWidth / FURN_TILE_SIZE));
-  const sx = (index % cols) * FURN_TILE_SIZE;
-  const sy = Math.floor(index / cols) * FURN_TILE_SIZE;
-  ctx.drawImage(
-    imgFurniture,
-    sx, sy,
-    FURN_TILE_SIZE, FURN_TILE_SIZE,
-    px, py,
-    TILE_SIZE, TILE_SIZE
-  );
-}
-
-// We'll just pick three indices from the sheet for the 3 furniture types
-const FURN1_INDEX = 0;   // e.g. table
-const FURN2_INDEX = 10;  // e.g. cabinet
-const FURN3_INDEX = 20;  // e.g. bed/sofa
-
-function drawTile(tile, x, y, camY) {
-  const px = x * TILE_SIZE;
-  const py = y * TILE_SIZE - camY;
-
-  if (py + TILE_SIZE < 0 || py > canvas.height) return;
-
-  const drawFloorBase = () => {
-    ctx.fillStyle = "#18141c";
-    ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-    ctx.fillStyle = "#211a29";
-    ctx.fillRect(px, py + TILE_SIZE - 4, TILE_SIZE, 4);
-  };
-
-  switch (tile) {
-    case TILE_FLOOR:
-      drawFloorBase();
-      break;
-    case TILE_WALL:
-      ctx.fillStyle = "#3b2a20";
-      ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-      ctx.strokeStyle = "#8a6848";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(px + 1, py + 1, TILE_SIZE - 2, TILE_SIZE - 2);
-      break;
-    case TILE_CLOSET:
-      drawFloorBase();
-      ctx.fillStyle = "#2b1a0b";
-      ctx.fillRect(px + 3, py + 2, TILE_SIZE - 6, TILE_SIZE - 4);
-      ctx.fillStyle = "#fddf62";
-      ctx.fillRect(px + TILE_SIZE / 2 - 1, py + TILE_SIZE / 2 - 2, 2, 6);
-      break;
-    case TILE_LOCKED_DOOR:
-      drawFloorBase();
-      ctx.fillStyle = "#4a2b14";
-      ctx.fillRect(px + 2, py + 2, TILE_SIZE - 4, TILE_SIZE - 4);
-      ctx.fillStyle = "#fddf62";
-      ctx.fillRect(px + TILE_SIZE / 2 - 1, py + TILE_SIZE / 2 - 2, 2, 4);
-      break;
-    case TILE_FLASHLIGHT:
-      drawFloorBase();
-      if (imgFlashlight.complete && imgFlashlight.naturalWidth > 0) {
-        ctx.drawImage(imgFlashlight, px, py, TILE_SIZE, TILE_SIZE);
-      } else {
-        ctx.fillStyle = "#ffe88a";
-        ctx.fillRect(px + 10, py + 8, 12, 16);
-      }
-      break;
-    case TILE_KEY:
-      drawFloorBase();
-      if (imgKey.complete && imgKey.naturalWidth > 0) {
-        ctx.drawImage(imgKey, px, py, TILE_SIZE, TILE_SIZE);
-      } else {
-        ctx.fillStyle = "#ffd95f";
-        ctx.fillRect(px + 8, py + 12, 16, 8);
-      }
-      break;
-    case TILE_VAPE:
-      drawFloorBase();
-      if (imgVape.complete && imgVape.naturalWidth > 0) {
-        ctx.drawImage(imgVape, px, py, TILE_SIZE, TILE_SIZE);
-      } else {
-        ctx.fillStyle = "#9be7ff";
-        ctx.fillRect(px + 12, py + 6, 8, 18);
-      }
-      break;
-    case TILE_BATHROOM:
-      drawFloorBase();
-      ctx.fillStyle = "#1a2433";
-      ctx.fillRect(px + 2, py + 2, TILE_SIZE - 4, TILE_SIZE - 4);
-      ctx.fillStyle = "#fddf62";
-      ctx.fillRect(px + TILE_SIZE / 2 - 1, py + TILE_SIZE / 2 - 2, 2, 4);
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "10px sans-serif";
-      ctx.fillText("WC", px + 6, py + 13);
-      break;
-    case TILE_FURN1:
-      drawFloorBase();
-      drawFurniture(FURN1_INDEX, px, py);
-      break;
-    case TILE_FURN2:
-      drawFloorBase();
-      drawFurniture(FURN2_INDEX, px, py);
-      break;
-    case TILE_FURN3:
-      drawFloorBase();
-      drawFurniture(FURN3_INDEX, px, py);
-      break;
-  }
-}
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Camera: horizontally fixed, vertically follows player
-  const maxCamY = MAP_H * TILE_SIZE - canvas.height;
-  let camY = player.y - canvas.height / 2;
-  if (camY < 0) camY = 0;
-  if (camY > maxCamY) camY = maxCamY < 0 ? 0 : maxCamY;
-
-  // Map
-  for (let y = 0; y < MAP_H; y++) {
-    for (let x = 0; x < MAP_W; x++) {
-      drawTile(map[y][x], x, y, camY);
-    }
-  }
-
-  // Player
-  const playerScreenY = player.y - camY;
-  if (imgPlayer.complete && imgPlayer.naturalWidth > 0) {
-    ctx.drawImage(
-      imgPlayer,
-      player.x - TILE_SIZE / 2,
-      playerScreenY - TILE_SIZE / 2,
-      TILE_SIZE,
-      TILE_SIZE
-    );
-  } else {
-    ctx.fillStyle = "#fddf62";
-    ctx.beginPath();
-    ctx.arc(player.x, playerScreenY, TILE_SIZE * 0.35, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Horiver
-  const horiverScreenY = horiver.y - camY;
-  if (imgHoriver.complete && imgHoriver.naturalWidth > 0) {
-    const s = TILE_SIZE * 1.5;
-    ctx.drawImage(
-      imgHoriver,
-      horiver.x - s / 2,
-      horiverScreenY - s / 2,
-      s,
-      s
-    );
-  } else {
-    ctx.fillStyle = "#b90035";
-    ctx.beginPath();
-    ctx.arc(horiver.x, horiverScreenY, TILE_SIZE * 0.45, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Fog / flashlight
-  if (!debugNoFog) {
-    const radius = hasFlashlight ? 320 : 240;
-
-    ctx.save();
-    ctx.fillStyle = "rgba(0,0,0,0.75)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const g = ctx.createRadialGradient(
-      player.x, playerScreenY, radius * 0.15,
-      player.x, playerScreenY, radius
-    );
-    g.addColorStop(0, "rgba(0,0,0,0)");
-    g.addColorStop(0.5, "rgba(0,0,0,0.35)");
-    g.addColorStop(1, "rgba(0,0,0,0.95)");
-
-    ctx.globalCompositeOperation = "destination-out";
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(player.x, playerScreenY, radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  hud.innerHTML =
-    `FLASHLIGHT: <strong>${hasFlashlight ? "YES" : "NO"}</strong> &nbsp;|&nbsp; ` +
-    `KEY: <strong>${hasKey ? "YES" : "NO"}</strong> &nbsp;|&nbsp; ` +
-    `VAPE: <strong>${hasVape ? "YES" : "NO"}</strong>` +
-    (debugNoFog ? " &nbsp;|&nbsp; FOG: OFF (debug)" : "");
-}
-
-/*************** GAME LOOP ***************/
-function gameLoop(timestamp) {
-  const dt = (timestamp - lastTime) / 1000;
-  lastTime = timestamp;
-
-  update(dt);
-  draw();
-
-  if (alive && !won) {
-    requestAnimationFrame(gameLoop);
-  }
-}
-
-/*************** INITIALIZE INTRO ***************/
-showNextIntro();
-</script>
+ <h1>HÓRIVER’S LAIR – LEVEL 1 (PROTOTYPE)</h1>
+ <div id="subtitle">
+ Mission: find the flashlight, key, vape and bathroom in Hóriver’s cursed mansion–castle
+ </div>
+ <div id="game-wrapper">
+ <canvas id="game" width="800" height="600"></canvas>
+ <div id="controls">
+ Move with <b>W A S D</b>. <b>R</b> = interact (pick up, flush, claim). <b>F</b> = hide in closets. Closets only protect you while h </div>
+ <div id="interactionPrompt"></div>
+ </div>
+ <div id="alertBanner">HÓRIVER HEARS YOU</div>
+ <!-- WELCOME OVERLAY WITH TYPEWRITER -->
+ <div id="welcomeOverlay" class="overlay active">
+ <div class="overlay-card" id="welcomeCard">
+ <div id="welcomeTextWrapper">
+ <div class="overlay-title">COMMUNISM PARTY HQ</div>
+ <div class="overlay-sub" id="welcomeText"></div>
+ <div id="welcomeHint">Click this box to continue...</div>
+ </div>
+ <div id="welcomeFinal" style="display:none;">
+ <img src="images/horiver-lair.png" alt="Horiver's Lair" />
+ <div class="overlay-title">HORIVER'S LAIR</div>
+ <div class="overlay-sub">Enter the cursed vape castle.</div>
+ <button class="btn btn-primary" id="enterBtn">Enter</button>
+ </div>
+ </div>
+ </div>
+ <!-- Death overlay -->
+ <div id="deathOverlay" class="overlay">
+ <div class="overlay-card">
+ <img src="images/horiver-jumpscare.png" alt="Horiver Jumpscare" />
+ <div class="overlay-title" style="color:#ff5555;">WASTED</div>
+ <div class="overlay-sub">
+ Hóriver caught you in the fog. The castle reeks of vape forever.
+ </div>
+ <button class="btn btn-primary" id="retryBtn">Retry Level</button>
+ </div>
+ </div>
+ <!-- Win overlay -->
+ <div id="winOverlay" class="overlay">
+ <div class="overlay-card">
+ <img src="images/bhoriver-token.png" alt="Token" />
+ <div class="overlay-title">MISSION COMPLETE</div>
+ <div class="overlay-sub">
+ The vape is flushed. Hóriver screams and dissolves into communist vapor. You claim your cursed token.
+ </div>
+ <button class="btn btn-primary" id="playAgainBtn">Play Again</button>
+ </div>
+ </div>
+ <script>
+ // ===== Helpers =====
+ function makeImage(name) {
+ const img = new Image();
+ img.src = "images/" + encodeURIComponent(name);
+ return img;
+ }
+ function makeSound(name, loop = false, volume = 1) {
+ const a = new Audio("sounds/" + encodeURIComponent(name));
+ a.loop = loop;
+ a.volume = volume;
+ return a;
+ }
+ function safePlay(a) {
+ a.currentTime = 0;
+ a.play().catch(() => {});
+ }
+ // ===== Canvas & world =====
+ const canvas = document.getElementById("game");
+ const ctx = canvas.getContext("2d");
+ const TILE = 32;
+ const WORLD_W = 24;
+ const WORLD_H = 24;
+ const playerSpeed = 120;
+ const horiverBaseSpeed = 90;
+ const T_WALL = 1;
+ const T_FLOOR = 0;
+ const T_CLOSET = 2;
+ const T_THRONE = 3;
+ const T_KEY = 4;
+ const T_CHEST = 5;
+ const T_BATHROOM = 6;
+ const T_FLASHLIGHT = 7;
+ const T_START = 8;
+ const world = [];
+ for (let y = 0; y < WORLD_H; y++) {
+ const row = new Array(WORLD_W).fill(T_WALL);
+ world.push(row);
+ }
+ function carveRect(x0, y0, x1, y1, type = T_FLOOR) {
+ for (let y = y0; y <= y1; y++) {
+ for (let x = x0; x <= x1; x++) {
+ if (x > 0 && y > 0 && x < WORLD_W - 1 && y < WORLD_H - 1) {
+ world[y][x] = type;
+ }
+ }
+ }
+ }
+ // ===== Small prototype layout (castle + mansion) =====
+ function generatePrototypeMap() {
+ // central area
+ carveRect(2, 2, WORLD_W - 3, WORLD_H - 3);
+ // entrance hall (bottom)
+ carveRect(4, WORLD_H - 6, 10, WORLD_H - 3);
+ world[WORLD_H - 5][5] = T_START;
+ // corridor up from entrance
+ carveRect(6, WORLD_H - 7, 6, 13);
+ // horizontal corridor to center
+ carveRect(6, 13, 16, 13);
+ // main central hall
+ carveRect(10, 6, 18, 16);
+ // throne room (top center)
+ carveRect(10, 3, 18, 6);
+ world[4][14] = T_THRONE;
+ // bedroom (left of hall)
+ carveRect(3, 6, 9, 11);
+ // dining room (right of hall)
+ carveRect(19, 6, 22, 12);
+ // bathroom (top-right)
+ carveRect(19, 3, 22, 5);
+ world[4][20] = T_BATHROOM;
+ // chest room (bottom-right of hall)
+ carveRect(19, 14, 22, 18);
+ world[16][20] = T_CHEST;
+ // flashlight in bedroom
+ world[8][5] = T_FLASHLIGHT;
+ // key in dining room
+ world[8][21] = T_KEY;
+ // closets (safe zones)
+ world[WORLD_H - 5][8] = T_CLOSET; // entrance closet
+ world[11][12] = T_CLOSET; // central closet
+ world[15][19] = T_CLOSET; // near chest
+ }
+ generatePrototypeMap();
+ function tileAt(tx, ty) {
+ if (tx < 0 || ty < 0 || tx >= WORLD_W || ty >= WORLD_H) return T_WALL;
+ return world[ty][tx];
+ }
+ function isWalkable(tx, ty) {
+ return tileAt(tx, ty) !== T_WALL;
+ }
+ function findTile(type) {
+ for (let y = 0; y < WORLD_H; y++) {
+ for (let x = 0; x < WORLD_W; x++) {
+ if (world[y][x] === type) return { x, y };
+ }
+ }
+ return null;
+ }
+ // ===== Assets =====
+ const imgPlayer = makeImage("player.png");
+ const imgHoriver = makeImage("horiver-character.png");
+ const imgFlashlight = makeImage("pixel-flashlight.png");
+ const imgKey = makeImage("key pixel.png");
+ const imgVape = makeImage("vape pixel.png");
+ const imgFurniture = makeImage("furniture.png");
+ const sounds = {
+ bgm: makeSound("backg-music.mp3", true, 0.45),
+ start: makeSound("start-sound.mp3"),
+ menuClick: makeSound("menu-click.mp3"),
+ pickup: makeSound("item-pickup.mp3"),
+ door: makeSound("door-open.mp3"),
+ flush: makeSound("toilet-flush.mp3"),
+ jumpscare: makeSound("jumpscare.mp3"),
+ win: makeSound("win.mp3"),
+ deathScream: makeSound("horiver-death-scream.mp3")
+ };
+ let musicStarted = false;
+ function startMusicOnce() {
+ if (!musicStarted) {
+ musicStarted = true;
+ safePlay(sounds.bgm);
+ }
+ }
+ // ===== Game state =====
+ let player = { x: 0, y: 0, vx: 0, vy: 0 };
+ let horiver = { x: 0, y: 0, vx: 0, vy: 0, active: false, alive: true };
+ let horiverFacing = { x: 0, y: 1 }; // for vision cone
+ let keys = { w: false, a: false, s: false, d: false };
+ let lastDir = { x: 0, y: 1 };
+ let haveFlashlight = false;
+ let haveKey = false;
+ let haveVape = false;
+ let vapeDestroyed = false;
+ let gameOver = false;
+ let win = false;
+ // stealth / rage
+ let playerHidden = false;
+ let closetNearby = false;
+ let closetTile = null;
+ let horiverEnraged = false;
+ // interaction system (press R / F)
+ let interactionPrompt = "";
+ let interactionAction = null;
+ const interactionEl = document.getElementById("interactionPrompt");
+ function clearInteraction() {
+ interactionPrompt = "";
+ interactionAction = null;
+ interactionEl.textContent = "";
+ }
+ function resetGame() {
+ const startTile = findTile(T_START) || { x: 5, y: WORLD_H - 5 };
+ player.x = (startTile.x + 0.5) * TILE;
+ player.y = (startTile.y + 0.5) * TILE;
+ player.vx = player.vy = 0;
+ const throneTile = findTile(T_THRONE) || { x: 14, y: 4 };
+ horiver.x = (throneTile.x + 0.5) * TILE;
+ horiver.y = (throneTile.y + 0.5) * TILE;
+ horiver.vx = horiver.vy = 0;
+ horiver.active = false;
+ horiver.alive = true;
+ horiverFacing = { x: 0, y: 1 };
+ haveFlashlight = false;
+ haveKey = false;
+ haveVape = false;
+ vapeDestroyed = false;
+ gameOver = false;
+ win = false;
+ playerHidden = false;
+ closetNearby = false;
+ closetTile = null;
+ horiverEnraged = false;
+ document.getElementById("subtitle").textContent =
+ "Mission: find the flashlight, key, vape and bathroom in Hóriver’s cursed mansion–castle";
+ hideAlert();
+ clearInteraction();
+ }
+ // ===== Input =====
+ window.addEventListener("keydown", (e) => {
+ const k = e.key.toLowerCase();
+ if (k === "w") keys.w = true;
+ if (k === "s") keys.s = true;
+ if (k === "a") keys.a = true;
+ if (k === "d") keys.d = true;
+ if (k === "f") {
+ if (
+ !document.getElementById("welcomeOverlay").classList.contains("active") &&
+ !gameOver &&
+ !win
+ ) {
+ toggleHideInCloset();
+ }
+ }
+ if (k === "r") {
+ if (
+ interactionAction &&
+ !document.getElementById("welcomeOverlay").classList.contains("active") &&
+ !gameOver &&
+ !win
+ ) {
+ const fn = interactionAction;
+ interactionAction = null;
+ interactionPrompt = "";
+ interactionEl.textContent = "";
+ fn();
+ }
+ }
+ });
+ window.addEventListener("keyup", (e) => {
+ const k = e.key.toLowerCase();
+ if (k === "w") keys.w = false;
+ if (k === "s") keys.s = false;
+ if (k === "a") keys.a = false;
+ if (k === "d") keys.d = false;
+ });
+ // ===== Alert banner =====
+ function showAlert() {
+ const el = document.getElementById("alertBanner");
+ el.style.display = "block";
+ setTimeout(() => { el.style.display = "none"; }, 2000);
+ }
+ function hideAlert() {
+ document.getElementById("alertBanner").style.display = "none";
+ }
+ function awakenHoriver() {
+ if (!horiver.active && horiver.alive) {
+ horiver.active = true;
+ showAlert();
+ safePlay(sounds.jumpscare);
+ }
+ }
+ function isCloset(tx, ty) {
+ return tileAt(tx, ty) === T_CLOSET;
+ }
+ // helper: find nearby tiles of certain types within a radius (pixels)
+ function findNearbyTile(types, px, py, range = 48) {
+ const tx = Math.floor(px / TILE);
+ const ty = Math.floor(py / TILE);
+ let best = null;
+ let bestDist = Infinity;
+ for (let dy = -1; dy <= 1; dy++) {
+ for (let dx = -1; dx <= 1; dx++) {
+ const nx = tx + dx;
+ const ny = ty + dy;
+ const tile = tileAt(nx, ny);
+ if (types.includes(tile)) {
+ const cx = (nx + 0.5) * TILE;
+ const cy = (ny + 0.5) * TILE;
+ const d = Math.hypot(px - cx, py - cy);
+ if (d < range && d < bestDist) {
+ bestDist = d;
+ best = { x: nx, y: ny, tile };
+ }
+ }
+ }
+ }
+ return best;
+ }
+ function pickupCheck() {
+ clearInteraction();
+ const px = player.x;
+ const py = player.y;
+ // Nearby items
+ const near = findNearbyTile(
+ [T_FLASHLIGHT, T_KEY, T_CHEST, T_BATHROOM, T_THRONE],
+ px, py, 48
+ );
+ if (near) {
+ const { x: tx, y: ty, tile: t } = near;
+ // flashlight
+ if (t === T_FLASHLIGHT && !haveFlashlight) {
+ interactionPrompt = 'Press R to pick up flashlight';
+ interactionAction = () => {
+ haveFlashlight = true;
+ world[ty][tx] = T_FLOOR;
+ safePlay(sounds.pickup);
+ document.getElementById("subtitle").textContent =
+ "Mission: find the key to Hóriver’s chest";
+ };
+ }
+ // key
+ if (t === T_KEY && !haveKey) {
+ interactionPrompt = 'Press R to pick up key';
+ interactionAction = () => {
+ haveKey = true;
+ world[ty][tx] = T_FLOOR;
+ safePlay(sounds.pickup);
+ awakenHoriver();
+ document.getElementById("subtitle").textContent =
+ "Mission: reach the chest and steal the vape";
+ };
+ }
+ // chest -> vape
+ if (t === T_CHEST && haveKey && !haveVape && !vapeDestroyed) {
+ interactionPrompt = 'Press R to steal Horiver\'s vape';
+ interactionAction = () => {
+ haveVape = true;
+ safePlay(sounds.door);
+ safePlay(sounds.pickup);
+ document.getElementById("subtitle").textContent =
+ "Mission: find the bathroom and flush the vape";
+ };
+ }
+ // bathroom flush
+ if (t === T_BATHROOM && haveVape && !vapeDestroyed) {
+ interactionPrompt = 'Press R to flush the vape';
+ interactionAction = () => {
+ haveVape = false;
+ vapeDestroyed = true;
+ safePlay(sounds.flush);
+ safePlay(sounds.deathScream);
+ horiver.alive = false;
+ horiver.active = false;
+ document.getElementById("subtitle").textContent =
+ "Mission: return to the throne to claim your reward";
+ };
+ }
+ // throne -> finish
+ if (t === T_THRONE && vapeDestroyed && !win) {
+ interactionPrompt = 'Press R to claim your reward';
+ interactionAction = () => {
+ finishLevel();
+ };
+ }
+ }
+ // closet detection (for F)
+ closetNearby = false;
+ closetTile = null;
+ const nearCloset = findNearbyTile([T_CLOSET], px, py, 56);
+ if (nearCloset) {
+ closetNearby = true;
+ closetTile = { x: nearCloset.x, y: nearCloset.y };
+ const closetMsg = playerHidden
+ ? "Press F to leave closet"
+ : "Press F to hide in closet";
+ if (!interactionPrompt) {
+ interactionPrompt = closetMsg;
+ } else {
+ interactionPrompt += " | " + closetMsg;
+ }
+ }
+ interactionEl.textContent = interactionPrompt;
+ }
+ function finishLevel() {
+ win = true;
+ safePlay(sounds.win);
+ document.getElementById("winOverlay").classList.add("active");
+ clearInteraction();
+ }
+ function killPlayer() {
+ if (gameOver || win) return;
+ gameOver = true;
+ safePlay(sounds.jumpscare);
+ document.getElementById("deathOverlay").classList.add("active");
+ clearInteraction();
+ }
+ function moveEntity(ent, dt) {
+ const nextX = ent.x + ent.vx * dt;
+ const nextY = ent.y + ent.vy * dt;
+ const txNewX = Math.floor(nextX / TILE);
+ const tyCur = Math.floor(ent.y / TILE);
+ if (isWalkable(txNewX, tyCur)) ent.x = nextX;
+ else ent.vx = 0;
+ const txCur = Math.floor(ent.x / TILE);
+ const tyNewY = Math.floor(nextY / TILE);
+ if (isWalkable(txCur, tyNewY)) ent.y = nextY;
+ else ent.vy = 0;
+ }
+ function toggleHideInCloset() {
+ // leave closet
+ if (playerHidden) {
+ playerHidden = false;
+ interactionPrompt = "";
+ interactionEl.textContent = "";
+ return;
+ }
+ // enter closet
+ if (!closetNearby || !closetTile) return;
+ playerHidden = true;
+ player.x = (closetTile.x + 0.5) * TILE;
+ player.y = (closetTile.y + 0.5) * TILE;
+ player.vx = player.vy = 0;
+ horiverEnraged = false; // lose the lock when you hide
+ interactionPrompt = "Hidden in closet. Press F to leave.";
+ interactionEl.textContent = interactionPrompt;
+ }
+ function updateMovement(dt) {
+ if (playerHidden) {
+ player.vx = player.vy = 0;
+ pickupCheck(); // still update F prompt etc.
+ return;
+ }
+ let dx = 0, dy = 0;
+ if (keys.w) dy -= 1;
+ if (keys.s) dy += 1;
+ if (keys.a) dx -= 1;
+ if (keys.d) dx += 1;
+ if (dx !== 0 || dy !== 0) {
+ const len = Math.hypot(dx, dy);
+ dx /= len; dy /= len;
+ player.vx = dx * playerSpeed;
+ player.vy = dy * playerSpeed;
+ lastDir.x = dx;
+ lastDir.y = dy;
+ } else {
+ player.vx = player.vy = 0;
+ }
+ moveEntity(player, dt);
+ pickupCheck();
+ }
+ function updateHoriver(dt) {
+ if (!horiver.active || !horiver.alive) return;
+ const dx = player.x - horiver.x;
+ const dy = player.y - horiver.y;
+ const dist = Math.hypot(dx, dy) || 1;
+ // update facing whenever he moves
+ const dirX = dx / dist;
+ const dirY = dy / dist;
+ if (dist > 1) {
+ horiverFacing.x = dirX;
+ horiverFacing.y = dirY;
+ }
+ // vision cone: slim but long, only matters if you have the vape and aren't hidden
+ if (!horiverEnraged && haveVape && !playerHidden) {
+ const maxRange = 260;
+ if (dist < maxRange) {
+ const toPlayerX = dx / dist;
+ const toPlayerY = dy / dist;
+ const dot =
+ toPlayerX * horiverFacing.x + toPlayerY * horiverFacing.y; // cos(angle)
+ const coneCos = Math.cos(20 * Math.PI / 180); // ~0.94, narrow
+ if (dot > coneCos) {
+ horiverEnraged = true;
+ showAlert();
+ }
+ }
+ }
+ const speed = horiverEnraged ? horiverBaseSpeed * 1.5 : horiverBaseSpeed;
+ if (dist > 1) {
+ horiver.vx = dirX * speed;
+ horiver.vy = dirY * speed;
+ } else {
+ horiver.vx = horiver.vy = 0;
+ }
+ moveEntity(horiver, dt);
+ const ptx = Math.floor(player.x / TILE);
+ const pty = Math.floor(player.y / TILE);
+ const htx = Math.floor(horiver.x / TILE);
+ const hty = Math.floor(horiver.y / TILE);
+ if (ptx === htx && pty === hty && !playerHidden && !vapeDestroyed) {
+ killPlayer();
+ }
+ }
+ function getCamera() {
+ let camX = player.x - canvas.width / 2;
+ let camY = player.y - canvas.height / 2;
+ const maxX = WORLD_W * TILE - canvas.width;
+ const maxY = WORLD_H * TILE - canvas.height;
+ camX = Math.max(0, Math.min(camX, maxX));
+ camY = Math.max(0, Math.min(camY, maxY));
+ return { x: camX, y: camY };
+ }
+ // Draw a 32×32 furniture tile from furniture.png at some source coords
+ function drawFurnitureTile(sx, sy, dx, dy) {
+ if (!imgFurniture.complete || !imgFurniture.naturalWidth) return;
+ ctx.drawImage(imgFurniture, sx, sy, 32, 32, dx, dy, TILE, TILE);
+ }
+ function render() {
+ const cam = getCamera();
+ ctx.clearRect(0, 0, canvas.width, canvas.height);
+ const startTX = Math.floor(cam.x / TILE);
+ const startTY = Math.floor(cam.y / TILE);
+ const endTX = Math.ceil((cam.x + canvas.width) / TILE);
+ const endTY = Math.ceil((cam.y + canvas.height) / TILE);
+ // ---- draw tiles & some furniture ----
+ for (let ty = startTY; ty <= endTY; ty++) {
+ for (let tx = startTX; tx <= endTX; tx++) {
+ const t = tileAt(tx, ty);
+ const sx = tx * TILE - cam.x;
+ const sy = ty * TILE - cam.y;
+ if (t === T_WALL) {
+ ctx.fillStyle = "#261014"; // wall
+ } else if (t === T_CLOSET) {
+ ctx.fillStyle = "#044b55"; // safe closet
+ } else if (t === T_BATHROOM) {
+ ctx.fillStyle = "#325c7a"; // bathroom
+ } else {
+ ctx.fillStyle = "#120509"; // floor
+ }
+ ctx.fillRect(sx, sy, TILE, TILE);
+ if (t === T_THRONE) {
+ ctx.fillStyle = "#c28b3b";
+ ctx.fillRect(sx + 4, sy + 4, TILE - 8, TILE - 8);
+ }
+ // simple furniture examples
+ if (tx === 21 && ty === 8) {
+ drawFurnitureTile(0, 0, sx, sy); // table/sofa
+ }
+ if (tx === 5 && ty === 8) {
+ drawFurnitureTile(96, 0, sx, sy); // bed/couch
+ }
+ if (tx === 20 && ty === 4) {
+ drawFurnitureTile(0, 160, sx, sy); // toilet/fixture
+ }
+ }
+ }
+ function drawSprite(img, gx, gy, scale = 0.9) {
+ const screenX = gx * TILE - cam.x;
+ const screenY = gy * TILE - cam.y;
+ const size = TILE * scale;
+ const dx = screenX + (TILE - size) / 2;
+ const dy = screenY + (TILE - size) / 2;
+ if (screenX + TILE < 0 || screenY + TILE < 0 ||
+ screenX > canvas.width || screenY > canvas.height) return;
+ if (img.complete && img.naturalWidth) {
+ ctx.drawImage(img, dx, dy, size, size);
+ } else {
+ ctx.fillStyle = "#0cf";
+ ctx.fillRect(dx, dy, size, size);
+ }
+ }
+ // ---- items (with key glow) ----
+ for (let ty = startTY; ty <= endTY; ty++) {
+ for (let tx = startTX; tx <= endTX; tx++) {
+ const t = tileAt(tx, ty);
+ const sxItem = tx * TILE - cam.x;
+ const syItem = ty * TILE - cam.y;
+ if (t === T_FLASHLIGHT && !haveFlashlight) {
+ drawSprite(imgFlashlight, tx, ty, 0.95);
+ }
+ if (t === T_KEY && !haveKey) {
+ ctx.fillStyle = "#ffd54a";
+ ctx.fillRect(sxItem + 6, syItem + 6, TILE - 12, TILE - 12);
+ drawSprite(imgKey, tx, ty, 0.95);
+ }
+ if (t === T_CHEST && haveKey && !vapeDestroyed && !haveVape) {
+ drawSprite(imgVape, tx, ty, 0.95);
+ }
+ }
+ }
+ // ---- player & horiver ----
+ drawSprite(imgPlayer, player.x / TILE, player.y / TILE, 0.95);
+ if (horiver.alive && horiver.active) {
+ drawSprite(imgHoriver, horiver.x / TILE, horiver.y / TILE, 0.95);
+ }
+ applyFog(player.x - cam.x, player.y - cam.y);
+ }
+ // Proper fog + flashlight cone: dark everywhere, bright around player,
+ // extra directional light once you have the flashlight.
+ function applyFog(pScreenX, pScreenY) {
+ // ---- 1) Darken whole screen ----
+ ctx.save();
+ ctx.fillStyle = "rgba(0, 0, 0, 0.94)";
+ ctx.fillRect(0, 0, canvas.width, canvas.height);
+ // ---- 2) Carve out a circular field of view ----
+ ctx.globalCompositeOperation = "destination-out";
+ const baseInnerRadius = haveFlashlight ? 50 : 25;
+ const baseOuterRadius = haveFlashlight ? 260 : 170;
+ const g = ctx.createRadialGradient(
+ pScreenX, pScreenY, baseInnerRadius,
+ pScreenX, pScreenY, baseOuterRadius
+ );
+ g.addColorStop(0, "rgba(0,0,0,1)");
+ g.addColorStop(0.7, "rgba(0,0,0,0.4)");
+ g.addColorStop(1, "rgba(0,0,0,0)");
+ ctx.fillStyle = g;
+ ctx.beginPath();
+ ctx.arc(pScreenX, pScreenY, baseOuterRadius, 0, Math.PI * 2);
+ ctx.fill();
+ ctx.restore();
+ // ---- 3) Add warm "light" so the center actually looks brighter ----
+ ctx.save();
+ ctx.globalCompositeOperation = "lighter";
+ const lightOuter = haveFlashlight ? 220 : 140;
+ const lightInner = 10;
+ const lg = ctx.createRadialGradient(
+ pScreenX, pScreenY, lightInner,
+ pScreenX, pScreenY, lightOuter
+ );
+ lg.addColorStop(0, "rgba(255, 230, 180, 0.85)");
+ lg.addColorStop(0.4, "rgba(255, 230, 180, 0.35)");
+ lg.addColorStop(1, "rgba(255, 230, 180, 0)");
+ ctx.fillStyle = lg;
+ ctx.beginPath();
+ ctx.arc(pScreenX, pScreenY, lightOuter, 0, Math.PI * 2);
+ ctx.fill();
+ // ---- 4) Extra narrow flashlight cone once picked up ----
+ if (haveFlashlight) {
+ const dirX = lastDir.x || 0;
+ const dirY = lastDir.y || 1;
+ const coneLength = 260;
+ const coneWidth = 90;
+ const tipX = pScreenX + dirX * coneLength;
+ const tipY = pScreenY + dirY * coneLength;
+ const perpX = -dirY;
+ const perpY = dirX;
+ const leftX = pScreenX + perpX * (coneWidth * 0.5);
+ const leftY = pScreenY + perpY * (coneWidth * 0.5);
+ const rightX = pScreenX - perpX * (coneWidth * 0.5);
+ const rightY = pScreenY - perpY * (coneWidth * 0.5);
+ const coneGrad = ctx.createLinearGradient(pScreenX, pScreenY, tipX, tipY);
+ coneGrad.addColorStop(0, "rgba(255, 245, 210, 0.9)");
+ coneGrad.addColorStop(1, "rgba(255, 245, 210, 0)");
+ ctx.fillStyle = coneGrad;
+ ctx.beginPath();
+ ctx.moveTo(leftX, leftY);
+ ctx.lineTo(tipX, tipY);
+ ctx.lineTo(rightX, rightY);
+ ctx.closePath();
+ ctx.fill();
+ }
+ ctx.restore();
+ }
+ // ===== Main loop =====
+ let lastTime = performance.now();
+ function loop(time) {
+ const dt = Math.min((time - lastTime) / 1000, 0.05);
+ lastTime = time;
+ if (!gameOver && !win && !document.getElementById("welcomeOverlay").classList.contains("active")) {
+ updateMovement(dt);
+ updateHoriver(dt);
+ render();
+ }
+ requestAnimationFrame(loop);
+ }
+ requestAnimationFrame(loop);
+ // ===== Overlays & typewriter intro =====
+ const welcomeOverlay = document.getElementById("welcomeOverlay");
+ const welcomeCard = document.getElementById("welcomeCard");
+ const welcomeTextEl = document.getElementById("welcomeText");
+ const welcomeHintEl = document.getElementById("welcomeHint");
+ const welcomeTextWrapper = document.getElementById("welcomeTextWrapper");
+ const welcomeFinal = document.getElementById("welcomeFinal");
+ const enterBtn = document.getElementById("enterBtn");
+ const deathOverlay = document.getElementById("deathOverlay");
+ const winOverlay = document.getElementById("winOverlay");
+ const welcomeMessages = [
+ "Welcome to Hubios communism party game. Your mission is to save communism Iceland, but first, you need to defeat some foes...",
+ "Now you'll enter... Horivers lair!!!",
+ "Are you ready?"
+ ];
+ let welcomeStep = 0;
+ let typingIndex = 0;
+ let typingTimer = null;
+ let typingDone = false;
+ function typeNextChar() {
+ const msg = welcomeMessages[welcomeStep];
+ if (typingIndex <= msg.length) {
+ welcomeTextEl.textContent = msg.slice(0, typingIndex);
+ typingIndex++;
+ } else {
+ clearInterval(typingTimer);
+ typingTimer = null;
+ typingDone = true;
+ welcomeHintEl.textContent = "Click this box to continue...";
+ }
+ }
+ function startTyping() {
+ if (typingTimer) clearInterval(typingTimer);
+ typingIndex = 0;
+ typingDone = false;
+ welcomeTextEl.textContent = "";
+ welcomeHintEl.textContent = "";
+ typingTimer = setInterval(typeNextChar, 35);
+ }
+ startTyping();
+ welcomeCard.addEventListener("click", () => {
+ startMusicOnce();
+ if (!typingDone) {
+ const msg = welcomeMessages[welcomeStep];
+ clearInterval(typingTimer);
+ typingTimer = null;
+ typingDone = true;
+ typingIndex = msg.length;
+ welcomeTextEl.textContent = msg;
+ welcomeHintEl.textContent = "Click this box to continue...";
+ return;
+ }
+ welcomeStep++;
+ if (welcomeStep < welcomeMessages.length) {
+ startTyping();
+ } else {
+ welcomeTextWrapper.style.display = "none";
+ welcomeFinal.style.display = "block";
+ }
+ });
+ enterBtn.addEventListener("click", (e) => {
+ e.stopPropagation();
+ safePlay(sounds.menuClick);
+ startMusicOnce();
+ welcomeOverlay.classList.remove("active");
+ resetGame();
+ safePlay(sounds.start);
+ });
+ document.getElementById("retryBtn").addEventListener("click", () => {
+ safePlay(sounds.menuClick);
+ deathOverlay.classList.remove("active");
+ resetGame();
+ });
+ document.getElementById("playAgainBtn").addEventListener("click", () => {
+ safePlay(sounds.menuClick);
+ winOverlay.classList.remove("active");
+ resetGame();
+ });
+ // initial render
+ render();
+ </script>
 </body>
 </html>
