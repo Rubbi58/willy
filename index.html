@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Communism Party – Hóriver's Lair (Prototype)</title>
+  <title>Hóriver Mini – 20x20 Wall Test</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * {
@@ -58,290 +58,60 @@
       color: #ffe6bf;
       text-align: center;
     }
-
-    #interactionPrompt {
-      margin-top: 4px;
-      font-size: 13px;
-      text-align: center;
-      color: #ffdd88;
-      min-height: 18px;
-    }
-
-    .overlay {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.88);
-      z-index: 40;
-    }
-    .overlay.active {
-      display: flex;
-    }
-
-    .overlay-card {
-      border-radius: 1.4rem;
-      border: 2px solid #ffcc66;
-      background: radial-gradient(circle at top, #4b0000 0, #050104 60%);
-      padding: 1.6rem 2rem 1.8rem;
-      max-width: 480px;
-      text-align: center;
-      color: #ffe6bf;
-      box-shadow: 0 26px 70px rgba(0, 0, 0, 0.9);
-    }
-
-    .overlay-card img {
-      max-width: 260px;
-      image-rendering: pixelated;
-      border-radius: 0.7rem;
-      margin-bottom: 0.9rem;
-    }
-
-    .overlay-title {
-      font-size: 1.4rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #ffdd88;
-      margin-bottom: 0.5rem;
-    }
-
-    .overlay-sub {
-      font-size: 0.92rem;
-      margin-bottom: 1.1rem;
-    }
-
-    .btn {
-      cursor: pointer;
-      border-radius: 999px;
-      padding: 0.6rem 1.5rem;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      border: none;
-      margin: 0 0.4rem;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #ffcc66, #ff4848);
-      color: #3b0000;
-      font-weight: 800;
-      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.7);
-    }
-    .btn-primary:hover {
-      filter: brightness(1.06);
-    }
-
-    #alertBanner {
-      position: fixed;
-      left: 50%;
-      top: 10%;
-      transform: translateX(-50%);
-      padding: 0.5rem 1.1rem;
-      border-radius: 999px;
-      border: 1px solid #ff4444;
-      background: rgba(60, 0, 0, 0.93);
-      color: #ffdddd;
-      font-size: 0.82rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      text-align: center;
-      display: none;
-      z-index: 25;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.8);
-    }
-
-    #welcomeOverlay img {
-      max-width: 280px;
-    }
-
-    #welcomeHint {
-      margin-top: 0.8rem;
-      font-size: 0.8rem;
-      opacity: 0.7;
-    }
-
-    @media (max-width: 900px) {
-      #game-wrapper {
-        transform: scale(0.85);
-      }
-      .overlay-card {
-        margin: 0 1rem;
-        padding-inline: 1.4rem;
-      }
-    }
   </style>
 </head>
 <body>
-  <h1>HÓRIVER’S LAIR – LEVEL 1 (PROTOTYPE)</h1>
-  <div id="subtitle">
-    Mission: find the flashlight, key, vape and bathroom in Hóriver’s cursed mansion–castle
-  </div>
+  <h1>HÓRIVER MINI – WALL TEST</h1>
+  <div id="subtitle">20×20 map – just walls, floor and flashlight</div>
 
   <div id="game-wrapper">
-    <canvas id="game" width="800" height="600"></canvas>
+    <canvas id="game" width="640" height="640"></canvas>
     <div id="controls">
-      Move with <b>W A S D</b>. <b>R</b> = interact (pick up, flush, claim). Closets = safe. Hóriver kills on contact.
-    </div>
-    <div id="interactionPrompt"></div>
-  </div>
-
-  <div id="alertBanner">HÓRIVER HEARS YOU</div>
-
-  <!-- WELCOME OVERLAY WITH TYPEWRITER -->
-  <div id="welcomeOverlay" class="overlay active">
-    <div class="overlay-card" id="welcomeCard">
-      <div id="welcomeTextWrapper">
-        <div class="overlay-title">COMMUNISM PARTY HQ</div>
-        <div class="overlay-sub" id="welcomeText"></div>
-        <div id="welcomeHint">Click this box to continue...</div>
-      </div>
-      <div id="welcomeFinal" style="display:none;">
-        <img src="images/horiver-lair.png" alt="Horiver's Lair" />
-        <div class="overlay-title">HORIVER'S LAIR</div>
-        <div class="overlay-sub">Enter the cursed vape castle.</div>
-        <button class="btn btn-primary" id="enterBtn">Enter</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Death overlay -->
-  <div id="deathOverlay" class="overlay">
-    <div class="overlay-card">
-      <img src="images/horiver-jumpscare.png" alt="Horiver Jumpscare" />
-      <div class="overlay-title" style="color:#ff5555;">WASTED</div>
-      <div class="overlay-sub">
-        Hóriver caught you in the fog. The castle reeks of vape forever.
-      </div>
-      <button class="btn btn-primary" id="retryBtn">Retry Level</button>
-    </div>
-  </div>
-
-  <!-- Win overlay -->
-  <div id="winOverlay" class="overlay">
-    <div class="overlay-card">
-      <img src="images/bhoriver-token.png" alt="Token" />
-      <div class="overlay-title">MISSION COMPLETE</div>
-      <div class="overlay-sub">
-        The vape is flushed. Hóriver screams and dissolves into communist vapor. You claim your cursed token.
-      </div>
-      <button class="btn btn-primary" id="playAgainBtn">Play Again</button>
+      Move with <b>W A S D</b>. Aim flashlight with your mouse.
     </div>
   </div>
 
   <script>
-    // ===== Helpers =====
-    function makeImage(name) {
-      const img = new Image();
-      img.src = "images/" + encodeURIComponent(name);
-      return img;
-    }
-
-    function makeSound(name, loop = false, volume = 1) {
-      const a = new Audio("sounds/" + encodeURIComponent(name));
-      a.loop = loop;
-      a.volume = volume;
-      return a;
-    }
-
-    function safePlay(a) {
-      a.currentTime = 0;
-      a.play().catch(() => {});
-    }
-
-    // ===== Canvas & world =====
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
 
-    // Offscreen fog canvas (so bright areas are truly bright)
-    const fogCanvas = document.createElement("canvas");
-    fogCanvas.width = canvas.width;
-    fogCanvas.height = canvas.height;
-    const fogCtx = fogCanvas.getContext("2d");
-
     const TILE = 32;
-    const WORLD_W = 24;
-    const WORLD_H = 24;
+    const WORLD_W = 20;
+    const WORLD_H = 20;
 
-    const playerSpeed = 120;
-    const horiverPatrolSpeed = 70;
-    const horiverChaseSpeed = 110;
-
-    const T_WALL = 1;
+    const T_WALL  = 1;
     const T_FLOOR = 0;
-    const T_CLOSET = 2;
-    const T_THRONE = 3;
-    const T_KEY = 4;
-    const T_CHEST = 5;
-    const T_BATHROOM = 6;
-    const T_FLASHLIGHT = 7;
-    const T_START = 8;
 
+    // --- simple 20x20 map: outer walls + two rooms ---
     const world = [];
     for (let y = 0; y < WORLD_H; y++) {
-      const row = new Array(WORLD_W).fill(T_WALL);
+      const row = [];
+      for (let x = 0; x < WORLD_W; x++) {
+        // outer border = wall
+        if (x === 0 || y === 0 || x === WORLD_W - 1 || y === WORLD_H - 1) {
+          row.push(T_WALL);
+        } else {
+          row.push(T_FLOOR);
+        }
+      }
       world.push(row);
     }
 
-    function carveRect(x0, y0, x1, y1, type = T_FLOOR) {
-      for (let y = y0; y <= y1; y++) {
-        for (let x = x0; x <= x1; x++) {
-          if (x > 0 && y > 0 && x < WORLD_W - 1 && y < WORLD_H - 1) {
-            world[y][x] = type;
-          }
-        }
+    // inner room 1 (top-left)
+    for (let y = 3; y <= 8; y++) {
+      for (let x = 3; x <= 8; x++) {
+        if (x === 3 || x === 8 || y === 3 || y === 8) world[y][x] = T_WALL;
+        else world[y][x] = T_FLOOR;
       }
     }
 
-    // ===== Small prototype layout (castle + mansion) =====
-    function generatePrototypeMap() {
-      // central area
-      carveRect(2, 2, WORLD_W - 3, WORLD_H - 3);
-
-      // entrance hall (bottom)
-      carveRect(4, WORLD_H - 6, 10, WORLD_H - 3);
-      world[WORLD_H - 5][5] = T_START;
-
-      // corridor up from entrance
-      carveRect(6, WORLD_H - 7, 6, 13);
-
-      // horizontal corridor to center
-      carveRect(6, 13, 16, 13);
-
-      // main central hall
-      carveRect(10, 6, 18, 16);
-
-      // throne room (top center)
-      carveRect(10, 3, 18, 6);
-      world[4][14] = T_THRONE;
-
-      // bedroom (left of hall)
-      carveRect(3, 6, 9, 11);
-
-      // dining room (right of hall)
-      carveRect(19, 6, 22, 12);
-
-      // bathroom (top-right)
-      carveRect(19, 3, 22, 5);
-      world[4][20] = T_BATHROOM;
-
-      // chest room (bottom-right of hall)
-      carveRect(19, 14, 22, 18);
-      world[16][20] = T_CHEST;
-
-      // flashlight in bedroom
-      world[8][5] = T_FLASHLIGHT;
-
-      // key in dining room
-      world[8][21] = T_KEY;
-
-      // closets (safe zones)
-      world[WORLD_H - 5][8] = T_CLOSET; // entrance closet
-      world[11][12] = T_CLOSET;        // central closet
-      world[15][19] = T_CLOSET;        // near chest
+    // inner room 2 (bottom-right)
+    for (let y = 11; y <= 17; y++) {
+      for (let x = 11; x <= 17; x++) {
+        if (x === 11 || x === 17 || y === 11 || y === 17) world[y][x] = T_WALL;
+        else world[y][x] = T_FLOOR;
+      }
     }
-
-    generatePrototypeMap();
 
     function tileAt(tx, ty) {
       if (tx < 0 || ty < 0 || tx >= WORLD_W || ty >= WORLD_H) return T_WALL;
@@ -352,268 +122,54 @@
       return tileAt(tx, ty) !== T_WALL;
     }
 
-    function findTile(type) {
-      for (let y = 0; y < WORLD_H; y++) {
-        for (let x = 0; x < WORLD_W; x++) {
-          if (world[y][x] === type) return { x, y };
-        }
-      }
-      return null;
-    }
-
-    // ===== Assets =====
-    const imgPlayer = makeImage("player.png");
-    const imgHoriver = makeImage("horiver-character.png");
-    const imgFlashlight = makeImage("pixel-flashlight.png");
-    const imgKey = makeImage("key pixel.png");
-    const imgVape = makeImage("vape pixel.png");
-    const imgFurniture = makeImage("furniture.png");
-
-    const sounds = {
-      bgm: makeSound("backg-music.mp3", true, 0.45),
-      start: makeSound("start-sound.mp3"),
-      menuClick: makeSound("menu-click.mp3"),
-      pickup: makeSound("item-pickup.mp3"),
-      door: makeSound("door-open.mp3"),
-      flush: makeSound("toilet-flush.mp3"),
-      jumpscare: makeSound("jumpscare.mp3"),
-      win: makeSound("win.mp3"),
-      deathScream: makeSound("horiver-death-scream.mp3")
+    // --- player ---
+    let player = {
+      x: (WORLD_W / 2 + 0.5) * TILE,
+      y: (WORLD_H / 2 + 0.5) * TILE,
+      vx: 0,
+      vy: 0
     };
 
-    let musicStarted = false;
-    function startMusicOnce() {
-      if (!musicStarted) {
-        musicStarted = true;
-        safePlay(sounds.bgm);
-      }
-    }
+    const keys = { w: false, a: false, s: false, d: false };
+    let mouseX = canvas.width / 2;
+    let mouseY = canvas.height / 2;
 
-    // ===== Game state =====
-    let player = { x: 0, y: 0, vx: 0, vy: 0 };
-    let horiver = { x: 0, y: 0, vx: 0, vy: 0, active: false, alive: true };
-
-    // Hóriver AI state: "idle" (on throne), "patrol", "chase"
-    let horiverState = "idle";
-    let horiverTarget = null;
-
-    // simple patrol points around central hall
-    const horiverPatrolPoints = [
-      { x: 14, y: 4 },   // throne
-      { x: 14, y: 9 },
-      { x: 14, y: 14 },
-      { x: 11, y: 11 },
-      { x: 17, y: 11 }
-    ];
-
-    let keys = { w: false, a: false, s: false, d: false };
-    let lastDir = { x: 0, y: 1 };
-
-    let haveFlashlight = false;
-    let haveKey = false;
-    let haveVape = false;
-    let vapeDestroyed = false;
-    let gameOver = false;
-    let win = false;
-
-    // interaction system (press R)
-    let interactionPrompt = "";
-    let interactionAction = null;
-    const interactionEl = document.getElementById("interactionPrompt");
-
-    function clearInteraction() {
-      interactionPrompt = "";
-      interactionAction = null;
-      interactionEl.textContent = "";
-    }
-
-    function resetGame() {
-      const startTile = findTile(T_START) || { x: 5, y: WORLD_H - 5 };
-      player.x = (startTile.x + 0.5) * TILE;
-      player.y = (startTile.y + 0.5) * TILE;
-      player.vx = player.vy = 0;
-
-      const throneTile = findTile(T_THRONE) || { x: 14, y: 4 };
-      horiver.x = (throneTile.x + 0.5) * TILE;
-      horiver.y = (throneTile.y + 0.5) * TILE;
-      horiver.vx = horiver.vy = 0;
-      horiver.active = false;
-      horiver.alive = true;
-      horiverState = "idle";
-      horiverTarget = null;
-
-      haveFlashlight = false;
-      haveKey = false;
-      haveVape = false;
-      vapeDestroyed = false;
-      gameOver = false;
-      win = false;
-
-      document.getElementById("subtitle").textContent =
-        "Mission: find the flashlight, key, vape and bathroom in Hóriver’s cursed mansion–castle";
-
-      hideAlert();
-      clearInteraction();
-    }
-
-    // ===== Input =====
-    window.addEventListener("keydown", (e) => {
+    window.addEventListener("keydown", e => {
       const k = e.key.toLowerCase();
       if (k === "w") keys.w = true;
-      if (k === "s") keys.s = true;
       if (k === "a") keys.a = true;
+      if (k === "s") keys.s = true;
       if (k === "d") keys.d = true;
-
-      if (k === "r") {
-        if (
-          interactionAction &&
-          !document.getElementById("welcomeOverlay").classList.contains("active") &&
-          !gameOver &&
-          !win
-        ) {
-          const fn = interactionAction;
-          interactionAction = null;
-          interactionPrompt = "";
-          interactionEl.textContent = "";
-          fn();
-        }
-      }
     });
-
-    window.addEventListener("keyup", (e) => {
+    window.addEventListener("keyup", e => {
       const k = e.key.toLowerCase();
       if (k === "w") keys.w = false;
-      if (k === "s") keys.s = false;
       if (k === "a") keys.a = false;
+      if (k === "s") keys.s = false;
       if (k === "d") keys.d = false;
     });
 
-    // ===== Alert banner =====
-    function showAlert() {
-      const el = document.getElementById("alertBanner");
-      el.style.display = "block";
-      setTimeout(() => { el.style.display = "none"; }, 2000);
-    }
-    function hideAlert() {
-      document.getElementById("alertBanner").style.display = "none";
-    }
-
-    function awakenHoriver() {
-      if (!horiver.active && horiver.alive) {
-        horiver.active = true;
-        horiverState = "patrol"; // start patrolling
-        pickNewHoriverTarget();
-        showAlert();
-        safePlay(sounds.jumpscare);
-      }
-    }
-
-    function isCloset(tx, ty) {
-      return tileAt(tx, ty) === T_CLOSET;
-    }
-
-    function pickupCheck() {
-      clearInteraction();
-
-      const tx = Math.floor(player.x / TILE);
-      const ty = Math.floor(player.y / TILE);
-      const t = tileAt(tx, ty);
-
-      // flashlight
-      if (t === T_FLASHLIGHT && !haveFlashlight) {
-        interactionPrompt = 'Press R to pick up flashlight';
-        interactionAction = () => {
-          haveFlashlight = true;
-          world[ty][tx] = T_FLOOR;
-          safePlay(sounds.pickup);
-          document.getElementById("subtitle").textContent =
-            "Mission: find the key to Hóriver’s chest";
-        };
-      }
-
-      // key
-      if (t === T_KEY && !haveKey) {
-        interactionPrompt = 'Press R to pick up key';
-        interactionAction = () => {
-          haveKey = true;
-          world[ty][tx] = T_FLOOR;
-          safePlay(sounds.pickup);
-          awakenHoriver();
-          document.getElementById("subtitle").textContent =
-            "Mission: reach the chest and steal the vape";
-        };
-      }
-
-      // chest -> vape
-      if (t === T_CHEST && haveKey && !haveVape && !vapeDestroyed) {
-        interactionPrompt = 'Press R to steal Horiver\'s vape';
-        interactionAction = () => {
-          haveVape = true;
-          safePlay(sounds.door);
-          safePlay(sounds.pickup);
-          document.getElementById("subtitle").textContent =
-            "Mission: find the bathroom and flush the vape";
-        };
-      }
-
-      // bathroom flush
-      if (t === T_BATHROOM && haveVape && !vapeDestroyed) {
-        interactionPrompt = 'Press R to flush the vape';
-        interactionAction = () => {
-          haveVape = false;
-          vapeDestroyed = true;
-          safePlay(sounds.flush);
-          safePlay(sounds.deathScream);
-          horiver.alive = false;
-          horiver.active = false;
-          horiverState = "idle";
-          document.getElementById("subtitle").textContent =
-            "Mission: return to the throne to claim your reward";
-        };
-      }
-
-      // throne -> finish
-      if (t === T_THRONE && vapeDestroyed && !win) {
-        interactionPrompt = 'Press R to claim your reward';
-        interactionAction = () => {
-          finishLevel();
-        };
-      }
-
-      interactionEl.textContent = interactionPrompt;
-    }
-
-    function finishLevel() {
-      win = true;
-      safePlay(sounds.win);
-      document.getElementById("winOverlay").classList.add("active");
-      clearInteraction();
-    }
-
-    function killPlayer() {
-      if (gameOver || win) return;
-      gameOver = true;
-      safePlay(sounds.jumpscare);
-      document.getElementById("deathOverlay").classList.add("active");
-      clearInteraction();
-    }
+    canvas.addEventListener("mousemove", e => {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+    });
 
     function moveEntity(ent, dt) {
       const nextX = ent.x + ent.vx * dt;
       const nextY = ent.y + ent.vy * dt;
 
       const txNewX = Math.floor(nextX / TILE);
-      const tyCur = Math.floor(ent.y / TILE);
+      const tyCur  = Math.floor(ent.y / TILE);
       if (isWalkable(txNewX, tyCur)) ent.x = nextX;
-      else ent.vx = 0;
 
-      const txCur = Math.floor(ent.x / TILE);
+      const txCur  = Math.floor(ent.x / TILE);
       const tyNewY = Math.floor(nextY / TILE);
       if (isWalkable(txCur, tyNewY)) ent.y = nextY;
-      else ent.vy = 0;
     }
 
-    function updateMovement(dt) {
+    function update(dt) {
+      const speed = 120;
       let dx = 0, dy = 0;
       if (keys.w) dy -= 1;
       if (keys.s) dy += 1;
@@ -623,353 +179,105 @@
       if (dx !== 0 || dy !== 0) {
         const len = Math.hypot(dx, dy);
         dx /= len; dy /= len;
-        player.vx = dx * playerSpeed;
-        player.vy = dy * playerSpeed;
-        lastDir.x = dx;
-        lastDir.y = dy;
+        player.vx = dx * speed;
+        player.vy = dy * speed;
       } else {
         player.vx = player.vy = 0;
       }
 
       moveEntity(player, dt);
-      pickupCheck();
-    }
-
-    // ===== Hóriver AI =====
-    function pickNewHoriverTarget() {
-      if (horiverPatrolPoints.length === 0) {
-        horiverTarget = null;
-        return;
-      }
-      const idx = Math.floor(Math.random() * horiverPatrolPoints.length);
-      horiverTarget = { ...horiverPatrolPoints[idx] };
-    }
-
-    function updateHoriver(dt) {
-      if (!horiver.alive || !horiver.active) return;
-
-      const ptx = Math.floor(player.x / TILE);
-      const pty = Math.floor(player.y / TILE);
-      const htx = Math.floor(horiver.x / TILE);
-      const hty = Math.floor(horiver.y / TILE);
-
-      const dx = player.x - horiver.x;
-      const dy = player.y - horiver.y;
-      const dist = Math.hypot(dx, dy);
-
-      const detectDist = 7 * TILE;
-      const loseDist = 11 * TILE;
-
-      // state transitions
-      if (horiverState !== "chase") {
-        // he can "see" you if close enough and you're not hiding
-        if (dist < detectDist && !isCloset(ptx, pty) && !vapeDestroyed) {
-          horiverState = "chase";
-        }
-      } else {
-        // already chasing: lose you if far or you hide in closet
-        if (dist > loseDist || isCloset(ptx, pty) || vapeDestroyed) {
-          horiverState = "patrol";
-          pickNewHoriverTarget();
-        }
-      }
-
-      if (horiverState === "idle") {
-        horiver.vx = horiver.vy = 0;
-        return;
-      }
-
-      if (horiverState === "patrol") {
-        if (!horiverTarget) pickNewHoriverTarget();
-        if (horiverTarget) {
-          const txCenter = (horiverTarget.x + 0.5) * TILE;
-          const tyCenter = (horiverTarget.y + 0.5) * TILE;
-          const pdx = txCenter - horiver.x;
-          const pdy = tyCenter - horiver.y;
-          const pdist = Math.hypot(pdx, pdy);
-
-          if (pdist > 4) {
-            horiver.vx = (pdx / pdist) * horiverPatrolSpeed;
-            horiver.vy = (pdy / pdist) * horiverPatrolSpeed;
-          } else {
-            pickNewHoriverTarget();
-          }
-        }
-      }
-
-      if (horiverState === "chase") {
-        if (dist > 1) {
-          horiver.vx = (dx / dist) * horiverChaseSpeed;
-          horiver.vy = (dy / dist) * horiverChaseSpeed;
-        } else {
-          horiver.vx = horiver.vy = 0;
-        }
-      }
-
-      moveEntity(horiver, dt);
-
-      // kill check
-      if (ptx === htx && pty === hty && !isCloset(ptx, pty) && !vapeDestroyed) {
-        killPlayer();
-      }
-    }
-
-    function getCamera() {
-      let camX = player.x - canvas.width / 2;
-      let camY = player.y - canvas.height / 2;
-      const maxX = WORLD_W * TILE - canvas.width;
-      const maxY = WORLD_H * TILE - canvas.height;
-      camX = Math.max(0, Math.min(camX, maxX));
-      camY = Math.max(0, Math.min(camY, maxY));
-      return { x: camX, y: camY };
-    }
-
-    // Draw a 32×32 furniture tile from furniture.png at some source coords
-    function drawFurnitureTile(sx, sy, dx, dy) {
-      if (!imgFurniture.complete || !imgFurniture.naturalWidth) return;
-      ctx.drawImage(imgFurniture, sx, sy, 32, 32, dx, dy, TILE, TILE);
     }
 
     function render() {
-      const cam = getCamera();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const startTX = Math.floor(cam.x / TILE);
-      const startTY = Math.floor(cam.y / TILE);
-      const endTX = Math.ceil((cam.x + canvas.width) / TILE);
-      const endTY = Math.ceil((cam.y + canvas.height) / TILE);
-
-      // ---- draw tiles & some furniture ----
-      for (let ty = startTY; ty <= endTY; ty++) {
-        for (let tx = startTX; tx <= endTX; tx++) {
-          const t = tileAt(tx, ty);
-          const sx = tx * TILE - cam.x;
-          const sy = ty * TILE - cam.y;
+      // draw tiles – VERY CLEAR:
+      for (let y = 0; y < WORLD_H; y++) {
+        for (let x = 0; x < WORLD_W; x++) {
+          const t = world[y][x];
+          const sx = x * TILE;
+          const sy = y * TILE;
 
           if (t === T_WALL) {
-            ctx.fillStyle = "#261014";        // wall
-          } else if (t === T_CLOSET) {
-            ctx.fillStyle = "#044b55";        // safe closet
-          } else if (t === T_BATHROOM) {
-            ctx.fillStyle = "#325c7a";        // bathroom
+            // walls = bright visible brick
+            ctx.fillStyle = "#553333";
+            ctx.fillRect(sx, sy, TILE, TILE);
+            ctx.strokeStyle = "#aa7777";
+            ctx.strokeRect(sx + 0.5, sy + 0.5, TILE - 1, TILE - 1);
           } else {
-            ctx.fillStyle = "#120509";        // floor
-          }
-          ctx.fillRect(sx, sy, TILE, TILE);
-
-          if (t === T_THRONE) {
-            ctx.fillStyle = "#c28b3b";
-            ctx.fillRect(sx + 4, sy + 4, TILE - 8, TILE - 8);
-          }
-
-          // simple furniture examples
-          if (tx === 21 && ty === 8) {
-            drawFurnitureTile(0, 0, sx, sy);          // table/sofa
-          }
-          if (tx === 5 && ty === 8) {
-            drawFurnitureTile(96, 0, sx, sy);        // bed/couch
-          }
-          if (tx === 20 && ty === 4) {
-            drawFurnitureTile(0, 160, sx, sy);       // toilet/fixture
+            // floor = darker cobble-ish
+            ctx.fillStyle = "#202026";
+            ctx.fillRect(sx, sy, TILE, TILE);
+            ctx.strokeStyle = "#2f2f35";
+            ctx.strokeRect(sx + 0.5, sy + 0.5, TILE - 1, TILE - 1);
           }
         }
       }
 
-      function drawSprite(img, gx, gy, scale = 0.9) {
-        const screenX = gx * TILE - cam.x;
-        const screenY = gy * TILE - cam.y;
-        const size = TILE * scale;
-        const dx = screenX + (TILE - size) / 2;
-        const dy = screenY + (TILE - size) / 2;
-        if (screenX + TILE < 0 || screenY + TILE < 0 || screenX > canvas.width || screenY > canvas.height) return;
+      // player (simple square)
+      ctx.fillStyle = "#ffd04a";
+      ctx.fillRect(player.x - 8, player.y - 8, 16, 16);
 
-        if (img.complete && img.naturalWidth) {
-          ctx.drawImage(img, dx, dy, size, size);
-        } else {
-          ctx.fillStyle = "#0cf";
-          ctx.fillRect(dx, dy, size, size);
-        }
-      }
-
-      // ---- items (with key glow) ----
-      for (let ty = startTY; ty <= endTY; ty++) {
-        for (let tx = startTX; tx <= endTX; tx++) {
-          const t = tileAt(tx, ty);
-          const sxItem = tx * TILE - cam.x;
-          const syItem = ty * TILE - cam.y;
-
-          if (t === T_FLASHLIGHT && !haveFlashlight) {
-            drawSprite(imgFlashlight, tx, ty, 0.95);
-          }
-
-          if (t === T_KEY && !haveKey) {
-            ctx.fillStyle = "#ffd54a";
-            ctx.fillRect(sxItem + 6, syItem + 6, TILE - 12, TILE - 12);
-            drawSprite(imgKey, tx, ty, 0.95);
-          }
-
-          if (t === T_CHEST && haveKey && !vapeDestroyed && !haveVape) {
-            drawSprite(imgVape, tx, ty, 0.95);
-          }
-        }
-      }
-
-      // ---- player & horiver ----
-      drawSprite(imgPlayer, player.x / TILE, player.y / TILE, 0.95);
-      if (horiver.alive && (horiver.active || horiverState === "idle")) {
-        drawSprite(imgHoriver, horiver.x / TILE, horiver.y / TILE, 0.95);
-      }
-
-      applyFog(player.x - cam.x, player.y - cam.y);
+      applyFog(player.x, player.y);
     }
 
-    // Fog: dark everywhere, but cut holes where the player can see.
-    // We build the fog on an offscreen canvas and then draw it on top.
-    function applyFog(pScreenX, pScreenY) {
-      // 1) prepare fog canvas
-      fogCtx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
+    function applyFog(px, py) {
+      ctx.save();
 
-      // full dark overlay
-      fogCtx.fillStyle = "rgba(0, 0, 0, 0.75)";
-      fogCtx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
+      // base vignette
+      const radius = 200;
+      const g = ctx.createRadialGradient(
+        px, py, 0,
+        px, py, radius
+      );
+      g.addColorStop(0, "rgba(0,0,0,0)");
+      g.addColorStop(0.7, "rgba(0,0,0,0.5)");
+      g.addColorStop(1, "rgba(0,0,0,0.97)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // punch holes in the fog where the player can see
-      fogCtx.globalCompositeOperation = "destination-out";
+      // flashlight cone (destination-out)
+      ctx.globalCompositeOperation = "destination-out";
+      const dx = mouseX - px;
+      const dy = mouseY - py;
+      let len = Math.hypot(dx, dy);
+      if (len < 0.001) len = 1;
+      const dirX = dx / len;
+      const dirY = dy / len;
 
-      // small glow around player (slightly bigger with flashlight)
-      const baseRadius = haveFlashlight ? 120 : 90;
-      fogCtx.beginPath();
-      fogCtx.arc(pScreenX, pScreenY, baseRadius, 0, Math.PI * 2);
-      fogCtx.fill();
+      const coneLength = 260;
+      const coneWidth  = Math.PI / 8; // narrower cone
 
-      // flashlight cone ONLY if we have the flashlight
-      if (haveFlashlight) {
-        const dirLen = Math.hypot(lastDir.x, lastDir.y) || 1;
-        const fx = pScreenX + (lastDir.x / dirLen) * 150;
-        const fy = pScreenY + (lastDir.y / dirLen) * 150;
-        const flashlightRadius = 190;
+      const angle = Math.atan2(dirY, dirX);
+      const a1 = angle - coneWidth;
+      const a2 = angle + coneWidth;
 
-        fogCtx.beginPath();
-        fogCtx.arc(fx, fy, flashlightRadius, 0, Math.PI * 2);
-        fogCtx.fill();
-      }
+      const tip1x = px + Math.cos(a1) * coneLength;
+      const tip1y = py + Math.sin(a1) * coneLength;
+      const tip2x = px + Math.cos(a2) * coneLength;
+      const tip2y = py + Math.sin(a2) * coneLength;
 
-      // reset blend mode on fog canvas
-      fogCtx.globalCompositeOperation = "source-over";
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(tip1x, tip1y);
+      ctx.lineTo(tip2x, tip2y);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(0,0,0,1)";
+      ctx.fill();
 
-      // 2) draw fog layer on main canvas
-      ctx.drawImage(fogCanvas, 0, 0);
+      ctx.restore();
     }
 
-    // ===== Main loop =====
-    let lastTime = performance.now();
-    function loop(time) {
-      const dt = Math.min((time - lastTime) / 1000, 0.05);
-      lastTime = time;
-
-      if (!gameOver && !win && !document.getElementById("welcomeOverlay").classList.contains("active")) {
-        updateMovement(dt);
-        updateHoriver(dt);
-        render();
-      }
-
+    // main loop
+    let last = performance.now();
+    function loop(t) {
+      const dt = Math.min((t - last) / 1000, 0.05);
+      last = t;
+      update(dt);
+      render();
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
-
-    // ===== Overlays & typewriter intro =====
-    const welcomeOverlay = document.getElementById("welcomeOverlay");
-    const welcomeCard = document.getElementById("welcomeCard");
-    const welcomeTextEl = document.getElementById("welcomeText");
-    const welcomeHintEl = document.getElementById("welcomeHint");
-    const welcomeTextWrapper = document.getElementById("welcomeTextWrapper");
-    const welcomeFinal = document.getElementById("welcomeFinal");
-    const enterBtn = document.getElementById("enterBtn");
-
-    const deathOverlay = document.getElementById("deathOverlay");
-    const winOverlay = document.getElementById("winOverlay");
-
-    const welcomeMessages = [
-      "Welcome to Hubios communism party game. Your mission is to save communism Iceland, but first, you need to defeat some foes...",
-      "Now you'll enter... Horivers lair!!!",
-      "Are you ready?"
-    ];
-    let welcomeStep = 0;
-    let typingIndex = 0;
-    let typingTimer = null;
-    let typingDone = false;
-
-    function typeNextChar() {
-      const msg = welcomeMessages[welcomeStep];
-      if (typingIndex <= msg.length) {
-        welcomeTextEl.textContent = msg.slice(0, typingIndex);
-        typingIndex++;
-      } else {
-        clearInterval(typingTimer);
-        typingTimer = null;
-        typingDone = true;
-        welcomeHintEl.textContent = "Click this box to continue...";
-      }
-    }
-
-    function startTyping() {
-      if (typingTimer) clearInterval(typingTimer);
-      typingIndex = 0;
-      typingDone = false;
-      welcomeTextEl.textContent = "";
-      welcomeHintEl.textContent = "";
-      typingTimer = setInterval(typeNextChar, 35);
-    }
-
-    startTyping();
-
-    welcomeCard.addEventListener("click", () => {
-      startMusicOnce();
-
-      if (!typingDone) {
-        const msg = welcomeMessages[welcomeStep];
-        clearInterval(typingTimer);
-        typingTimer = null;
-        typingDone = true;
-        typingIndex = msg.length;
-        welcomeTextEl.textContent = msg;
-        welcomeHintEl.textContent = "Click this box to continue...";
-        return;
-      }
-
-      welcomeStep++;
-      if (welcomeStep < welcomeMessages.length) {
-        startTyping();
-      } else {
-        welcomeTextWrapper.style.display = "none";
-        welcomeFinal.style.display = "block";
-      }
-    });
-
-    enterBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      safePlay(sounds.menuClick);
-      startMusicOnce();
-      welcomeOverlay.classList.remove("active");
-      resetGame();
-      safePlay(sounds.start);
-    });
-
-    document.getElementById("retryBtn").addEventListener("click", () => {
-      safePlay(sounds.menuClick);
-      deathOverlay.classList.remove("active");
-      resetGame();
-    });
-
-    document.getElementById("playAgainBtn").addEventListener("click", () => {
-      safePlay(sounds.menuClick);
-      winOverlay.classList.remove("active");
-      resetGame();
-    });
-
-    // initial render
-    render();
   </script>
 </body>
 </html>
-
