@@ -221,52 +221,51 @@
       applyFog(player.x, player.y);
     }
 
-    function applyFog(px, py) {
-      ctx.save();
+   function applyFog(px, py) {
+  ctx.save();
 
-      // base vignette
-      const radius = 200;
-      const g = ctx.createRadialGradient(
-        px, py, 0,
-        px, py, radius
-      );
-      g.addColorStop(0, "rgba(0,0,0,0)");
-      g.addColorStop(0.7, "rgba(0,0,0,0.5)");
-      g.addColorStop(1, "rgba(0,0,0,0.97)");
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // 1) Start with full darkness
+  ctx.fillStyle = "rgba(0,0,0,0.85)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // flashlight cone (destination-out)
-      ctx.globalCompositeOperation = "destination-out";
-      const dx = mouseX - px;
-      const dy = mouseY - py;
-      let len = Math.hypot(dx, dy);
-      if (len < 0.001) len = 1;
-      const dirX = dx / len;
-      const dirY = dy / len;
+  // 2) Cut holes in the darkness (light areas)
+  ctx.globalCompositeOperation = "destination-out";
 
-      const coneLength = 260;
-      const coneWidth  = Math.PI / 8; // narrower cone
+  // Small aura around player
+  const auraRadius = 90;
+  ctx.beginPath();
+  ctx.arc(px, py, auraRadius, 0, Math.PI * 2);
+  ctx.fill();
 
-      const angle = Math.atan2(dirY, dirX);
-      const a1 = angle - coneWidth;
-      const a2 = angle + coneWidth;
+  // 3) Flashlight cone
+  const dx = mouseX - px;
+  const dy = mouseY - py;
+  let len = Math.hypot(dx, dy);
+  if (len < 0.001) len = 1;
+  const dirX = dx / len;
+  const dirY = dy / len;
 
-      const tip1x = px + Math.cos(a1) * coneLength;
-      const tip1y = py + Math.sin(a1) * coneLength;
-      const tip2x = px + Math.cos(a2) * coneLength;
-      const tip2y = py + Math.sin(a2) * coneLength;
+  const coneLength = 260;          // how far the flashlight reaches
+  const coneWidth  = Math.PI / 10; // narrow cone
 
-      ctx.beginPath();
-      ctx.moveTo(px, py);
-      ctx.lineTo(tip1x, tip1y);
-      ctx.lineTo(tip2x, tip2y);
-      ctx.closePath();
-      ctx.fillStyle = "rgba(0,0,0,1)";
-      ctx.fill();
+  const angle = Math.atan2(dirY, dirX);
+  const a1 = angle - coneWidth;
+  const a2 = angle + coneWidth;
 
-      ctx.restore();
-    }
+  const tip1x = px + Math.cos(a1) * coneLength;
+  const tip1y = py + Math.sin(a1) * coneLength;
+  const tip2x = px + Math.cos(a2) * coneLength;
+  const tip2y = py + Math.sin(a2) * coneLength;
+
+  ctx.beginPath();
+  ctx.moveTo(px, py);
+  ctx.lineTo(tip1x, tip1y);
+  ctx.lineTo(tip2x, tip2y);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.restore();
+}
 
     // main loop
     let last = performance.now();
