@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Hóriver Mini – Wall Test (Fixed Light)</title>
+  <title>Hóriver – Wall Tiles Test (100×100)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * {
@@ -61,13 +61,13 @@
   </style>
 </head>
 <body>
-  <h1>HÓRIVER MINI – WALL TEST</h1>
-  <div id="subtitle">20×20 map – just walls, floor and flashlight</div>
+  <h1>HÓRIVER – WALL TILE TEST</h1>
+  <div id="subtitle">Check walls & floor from dungeons-pack.png</div>
 
   <div id="game-wrapper">
-    <canvas id="game" width="640" height="640"></canvas>
+    <canvas id="game" width="800" height="800"></canvas>
     <div id="controls">
-      Move with <b>W A S D</b>. Aim flashlight with your mouse.
+      Move with <b>W A S D</b>. Simple light, no cone. Just testing tiles.
     </div>
   </div>
 
@@ -76,38 +76,68 @@
     const ctx = canvas.getContext("2d");
 
     const TILE = 32;
-    const WORLD_W = 20;
-    const WORLD_H = 20;
+    const WORLD_W = 100;
+    const WORLD_H = 100;
 
     const T_WALL  = 1;
     const T_FLOOR = 0;
 
+    // --- deterministic random for floor defects / bones ---
+    function coordRand(x, y, seed = 1337) {
+      let n = x * 374761393 + y * 668265263 + seed * 1442695040888963407;
+      n = (n ^ (n >> 13)) * 1274126177;
+      n = (n ^ (n >> 16));
+      return (n >>> 0) / 4294967295;
+    }
+
+    // --- world array ---
     const world = [];
     for (let y = 0; y < WORLD_H; y++) {
       const row = [];
       for (let x = 0; x < WORLD_W; x++) {
-        if (x === 0 || y === 0 || x === WORLD_W - 1 || y === WORLD_H - 1) {
-          row.push(T_WALL);
-        } else {
-          row.push(T_FLOOR);
-        }
+        row.push(T_FLOOR);
       }
       world.push(row);
     }
 
-    // inner room 1 (top-left)
-    for (let y = 3; y <= 8; y++) {
-      for (let x = 3; x <= 8; x++) {
-        if (x === 3 || x === 8 || y === 3 || y === 8) world[y][x] = T_WALL;
-        else world[y][x] = T_FLOOR;
+    // helper: carve rectangle of walls (frame), interior floor
+    function carveRoomFrame(x0, y0, x1, y1) {
+      for (let y = y0; y <= y1; y++) {
+        for (let x = x0; x <= x1; x++) {
+          if (x === x0 || x === x1 || y === y0 || y === y1) {
+            world[y][x] = T_WALL;
+          } else {
+            world[y][x] = T_FLOOR;
+          }
+        }
       }
     }
 
-    // inner room 2 (bottom-right)
-    for (let y = 11; y <= 17; y++) {
-      for (let x = 11; x <= 17; x++) {
-        if (x === 11 || x === 17 || y === 11 || y === 17) world[y][x] = T_WALL;
-        else world[y][x] = T_FLOOR;
+    // outer big frame (like outer walls)
+    carveRoomFrame(2, 2, 97, 97);
+
+    // central hall (4 tiles wide vertically)
+    carveRoomFrame(48, 10, 51, 90);
+
+    // left room
+    carveRoomFrame(10, 20, 35, 45);
+
+    // right room
+    carveRoomFrame(65, 20, 90, 45);
+
+    // bottom-left room
+    carveRoomFrame(10, 60, 35, 85);
+
+    // bottom-right room
+    carveRoomFrame(65, 60, 90, 85);
+
+    // simple 4-wide corridor from central hall to left/right rooms
+    for (let y = 32; y <= 37; y++) {
+      for (let x = 35; x <= 48; x++) {
+        world[y][x] = T_FLOOR;
+      }
+      for (let x = 51; x <= 65; x++) {
+        world[y][x] = T_FLOOR;
       }
     }
 
@@ -120,16 +150,15 @@
       return tileAt(tx, ty) !== T_WALL;
     }
 
+    // --- player ---
     let player = {
-      x: (WORLD_W / 2 + 0.5) * TILE,
-      y: (WORLD_H / 2 + 0.5) * TILE,
+      x: (50 + 0.5) * TILE,
+      y: (50 + 0.5) * TILE,
       vx: 0,
       vy: 0
     };
 
     const keys = { w: false, a: false, s: false, d: false };
-    let mouseX = canvas.width / 2;
-    let mouseY = canvas.height / 2;
 
     window.addEventListener("keydown", e => {
       const k = e.key.toLowerCase();
@@ -138,6 +167,7 @@
       if (k === "s") keys.s = true;
       if (k === "d") keys.d = true;
     });
+
     window.addEventListener("keyup", e => {
       const k = e.key.toLowerCase();
       if (k === "w") keys.w = false;
@@ -146,11 +176,100 @@
       if (k === "d") keys.d = false;
     });
 
-    canvas.addEventListener("mousemove", e => {
-      const rect = canvas.getBoundingClientRect();
-      mouseX = e.clientX - rect.left;
-      mouseY = e.clientY - rect.top;
-    });
+    // --- assets (tileset only) ---
+    function makeImage(name) {
+      const img = new Image();
+      img.src = "images/" + encodeURIComponent(name);
+      return img;
+    }
+
+    const imgTiles = makeImage("dungeons-pack.png");
+
+    function drawTilesetTile(img, tileX, tileY, dx, dy) {
+      if (!img.complete || !img.naturalWidth) {
+        ctx.fillStyle = "#444";
+        ctx.fillRect(dx, dy, TILE, TILE);
+        return;
+      }
+      const sx = (tileX - 1) * 32; // 32×32 tiles
+      const sy = (tileY - 1) * 32;
+      ctx.drawImage(img, sx, sy, 32, 32, dx, dy, TILE, TILE);
+    }
+
+    // your coordinates from dungeons-pack.png:
+    // floor variants: (18,11), (19,11), (12,11), bones at (11,15)
+    // walls:
+    // top-left corner:  (13,6)
+    // top-right corner: (14,6)
+    // bottom-left:      (13,7)   // I assume 7 here; you wrote (13,6), but that’s likely a typo
+    // bottom-right:     (14,7)
+    // vertical wall:    (12,7)
+    // end-wall cap:     (9,6)
+
+    function drawFloor(tx, ty, dx, dy) {
+      const r = coordRand(tx, ty);
+      if (r < 0.33) drawTilesetTile(imgTiles, 18, 11, dx, dy);
+      else if (r < 0.66) drawTilesetTile(imgTiles, 19, 11, dx, dy);
+      else drawTilesetTile(imgTiles, 12, 11, dx, dy);
+
+      // bones sprinkled
+      if (r > 0.92) {
+        drawTilesetTile(imgTiles, 11, 15, dx, dy);
+      }
+    }
+
+    function drawWall(tx, ty, dx, dy) {
+      const up    = tileAt(tx, ty - 1) === T_WALL;
+      const down  = tileAt(tx, ty + 1) === T_WALL;
+      const left  = tileAt(tx - 1, ty) === T_WALL;
+      const right = tileAt(tx + 1, ty) === T_WALL;
+
+      // corners
+      if (!up && !left && right && down) {
+        // top-left corner
+        drawTilesetTile(imgTiles, 13, 6, dx, dy);
+        return;
+      }
+      if (!up && !right && left && down) {
+        // top-right corner
+        drawTilesetTile(imgTiles, 14, 6, dx, dy);
+        return;
+      }
+      if (!down && !left && right && up) {
+        // bottom-left corner
+        drawTilesetTile(imgTiles, 13, 7, dx, dy); // if you really want (13,6) here, change 7 to 6
+        return;
+      }
+      if (!down && !right && left && up) {
+        // bottom-right corner
+        drawTilesetTile(imgTiles, 14, 7, dx, dy);
+        return;
+      }
+
+      // vertical-only
+      if (up && down && !left && !right) {
+        drawTilesetTile(imgTiles, 12, 7, dx, dy);
+        return;
+      }
+
+      // end cap (only one neighbor in any direction)
+      const neighbors = (up?1:0)+(down?1:0)+(left?1:0)+(right?1:0);
+      if (neighbors === 1) {
+        drawTilesetTile(imgTiles, 9, 6, dx, dy);
+        return;
+      }
+
+      // horizontal or mixed – just reuse top-edge pieces alternating
+      if (left || right) {
+        const useRightPiece = ((tx + ty) % 2 === 0);
+        if (useRightPiece) drawTilesetTile(imgTiles, 14, 6, dx, dy);
+        else drawTilesetTile(imgTiles, 13, 6, dx, dy);
+        return;
+      }
+
+      // fallback
+      drawTilesetTile(imgTiles, 13, 6, dx, dy);
+    }
 
     function moveEntity(ent, dt) {
       const nextX = ent.x + ent.vx * dt;
@@ -166,7 +285,7 @@
     }
 
     function update(dt) {
-      const speed = 120;
+      const speed = 140;
       let dx = 0, dy = 0;
       if (keys.w) dy -= 1;
       if (keys.s) dy += 1;
@@ -185,81 +304,57 @@
       moveEntity(player, dt);
     }
 
-    function render() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // draw grid
-      for (let y = 0; y < WORLD_H; y++) {
-        for (let x = 0; x < WORLD_W; x++) {
-          const t = world[y][x];
-          const sx = x * TILE;
-          const sy = y * TILE;
-
-          if (t === T_WALL) {
-            ctx.fillStyle = "#553333";
-            ctx.fillRect(sx, sy, TILE, TILE);
-            ctx.strokeStyle = "#aa7777";
-            ctx.strokeRect(sx + 0.5, sy + 0.5, TILE - 1, TILE - 1);
-          } else {
-            ctx.fillStyle = "#202026";
-            ctx.fillRect(sx, sy, TILE, TILE);
-            ctx.strokeStyle = "#2f2f35";
-            ctx.strokeRect(sx + 0.5, sy + 0.5, TILE - 1, TILE - 1);
-          }
-        }
-      }
-
-      // player
-      ctx.fillStyle = "#ffd04a";
-      ctx.fillRect(player.x - 8, player.y - 8, 16, 16);
-
-      applyFog(player.x, player.y);
+    function getCamera() {
+      let camX = player.x - canvas.width / 2;
+      let camY = player.y - canvas.height / 2;
+      const maxX = WORLD_W * TILE - canvas.width;
+      const maxY = WORLD_H * TILE - canvas.height;
+      camX = Math.max(0, Math.min(camX, maxX));
+      camY = Math.max(0, Math.min(camY, maxY));
+      return { x: camX, y: camY };
     }
 
     function applyFog(px, py) {
       ctx.save();
-
-      // 1) Full darkness
-      ctx.fillStyle = "rgba(0,0,0,0.88)";
+      // simple circular light – no cone in this test
+      const radius = 220;
+      const g = ctx.createRadialGradient(px, py, 0, px, py, radius);
+      g.addColorStop(0, "rgba(0,0,0,0)");
+      g.addColorStop(0.7, "rgba(0,0,0,0.4)");
+      g.addColorStop(1, "rgba(0,0,0,0.95)");
+      ctx.fillStyle = g;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // 2) Cut holes (light) out of darkness
-      ctx.globalCompositeOperation = "destination-out";
-
-      // Small aura around player
-      const auraRadius = 90;
-      ctx.beginPath();
-      ctx.arc(px, py, auraRadius, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Flashlight cone
-      const dx = mouseX - px;
-      const dy = mouseY - py;
-      let len = Math.hypot(dx, dy);
-      if (len < 0.001) len = 1;
-      const dirX = dx / len;
-      const dirY = dy / len;
-
-      const coneLength = 260;
-      const coneWidth  = Math.PI / 10; // narrow cone
-
-      const angle = Math.atan2(dirY, dirX);
-      const a1 = angle - coneWidth;
-      const a2 = angle + coneWidth;
-
-      const tip1x = px + Math.cos(a1) * coneLength;
-      const tip1y = py + Math.sin(a1) * coneLength;
-      const tip2x = px + Math.cos(a2) * coneLength;
-      const tip2y = py + Math.sin(a2) * coneLength;
-
-      ctx.beginPath();
-      ctx.moveTo(px, py);
-      ctx.lineTo(tip1x, tip1y);
-      ctx.lineTo(tip2x, tip2y);
-      ctx.closePath();
-      ctx.fill();
-
       ctx.restore();
+    }
+
+    function render() {
+      const cam = getCamera();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const startTX = Math.floor(cam.x / TILE);
+      const startTY = Math.floor(cam.y / TILE);
+      const endTX = Math.ceil((cam.x + canvas.width) / TILE);
+      const endTY = Math.ceil((cam.y + canvas.height) / TILE);
+
+      for (let ty = startTY; ty <= endTY; ty++) {
+        for (let tx = startTX; tx <= endTX; tx++) {
+          if (tx < 0 || ty < 0 || tx >= WORLD_W || ty >= WORLD_H) continue;
+          const t = world[ty][tx];
+          const dx = tx * TILE - cam.x;
+          const dy = ty * TILE - cam.y;
+
+          if (t === T_WALL) drawWall(tx, ty, dx, dy);
+          else drawFloor(tx, ty, dx, dy);
+        }
+      }
+
+      // player
+      const px = player.x - cam.x;
+      const py = player.y - cam.y;
+      ctx.fillStyle = "#ffd04a";
+      ctx.fillRect(px - 8, py - 8, 16, 16);
+
+      applyFog(px, py);
     }
 
     let last = performance.now();
