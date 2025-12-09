@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Hóriver – 100×100 Mansion Layout (Generated Tiles)</title>
+  <title>Hóriver – 100×100 Mansion Layout (Generated Tiles, More Paths)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * {
@@ -62,12 +62,12 @@
 </head>
 <body>
   <h1>HÓRIVER’S LAIR – GENERATED TILE TEST</h1>
-  <div id="subtitle">100×100 fixed layout • walls, rooms, furniture & candles (no sprites yet)</div>
+  <div id="subtitle">100×100 layout • more corridors & loops (no sprites yet)</div>
 
   <div id="game-wrapper">
     <canvas id="game" width="800" height="800"></canvas>
     <div id="controls">
-      Move with <b>W A S D</b>. Soft light around you. This version is just to check layout & tiles.
+      Move with <b>W A S D</b>. Soft light around you. This version is to check rooms + pathways.
     </div>
   </div>
 
@@ -92,7 +92,7 @@
     const T_TOILET   = 9;
     const T_SINK     = 10;
     const T_THRONE   = 11;
-    const T_CARPET   = 12; // throne carpet strip
+    const T_CARPET   = 12;
 
     // world grid
     const world = [];
@@ -101,7 +101,6 @@
       world.push(row);
     }
 
-    // helper random but deterministic per coordinate
     function coordRand(x, y, seed = 1337) {
       let n = x * 374761393 + y * 668265263 + seed;
       n = (n ^ (n >> 13)) * 1274126177;
@@ -121,8 +120,8 @@
       }
     }
 
-    function carveCorridorX(y0, x0, x1, width = 4) {
-      const yStart = y0 - Math.floor(width / 2);
+    function carveCorridorX(yCenter, x0, x1, width = 4) {
+      const yStart = yCenter - Math.floor(width / 2);
       const yEnd = yStart + width - 1;
       for (let y = yStart; y <= yEnd; y++) {
         for (let x = Math.min(x0, x1); x <= Math.max(x0, x1); x++) {
@@ -131,8 +130,8 @@
       }
     }
 
-    function carveCorridorY(x0, y0, y1, width = 4) {
-      const xStart = x0 - Math.floor(width / 2);
+    function carveCorridorY(xCenter, y0, y1, width = 4) {
+      const xStart = xCenter - Math.floor(width / 2);
       const xEnd = xStart + width - 1;
       for (let x = xStart; x <= xEnd; x++) {
         for (let y = Math.min(y0, y1); y <= Math.max(y0, y1); y++) {
@@ -141,52 +140,75 @@
       }
     }
 
-    // === Layout design ===
+    // === Layout ===
+
     // Outer boundary room
     carveRoom(2, 2, 97, 97);
-
-    // Entrance hallway at bottom center (4 wide, not too long)
-    carveCorridorY(50, 80, 60, 4); // vertical bit inside
-    carveCorridorY(50, 97, 80, 4); // down to edge (like front door)
 
     // Main central hall
     carveRoom(40, 40, 60, 60);
 
     // Throne room at top center
-    carveRoom(40, 10, 60, 30);
+    carveRoom(40, 12, 60, 30);
 
-    // Bedrooms left
-    carveRoom(10, 40, 30, 60);
-    carveRoom(10, 20, 30, 38);
+    // Bedrooms left (upper + lower)
+    carveRoom(10, 32, 30, 48); // upper bedroom
+    carveRoom(10, 52, 30, 68); // lower bedroom
 
-    // Dining room right
-    carveRoom(70, 40, 90, 60);
-
-    // Kitchen near dining
-    carveRoom(70, 20, 90, 38);
-
-    // Library left-top
+    // Library top-left
     carveRoom(10, 10, 30, 30);
 
-    // Bathroom near throne
-    carveRoom(65, 10, 80, 30);
+    // Dining room right-middle
+    carveRoom(70, 40, 90, 60);
 
-    // Corridors linking rooms to main hall (4 wide)
-    // Bedrooms ↔ main hall
-    carveCorridorX(50, 30, 40, 4);
-    carveCorridorX(30, 30, 40, 4);
+    // Kitchen right-lower
+    carveRoom(70, 62, 90, 80);
 
-    // Dining ↔ main hall
-    carveCorridorX(50, 60, 70, 4);
-    carveCorridorX(30, 60, 70, 4);
+    // Bathroom top-right
+    carveRoom(70, 10, 90, 30);
 
-    // Throne ↔ main hall
+    // Entrance vertical hallway at bottom center (4 wide, not too long)
+    carveCorridorY(50, 80, 96, 4);  // bottom up to ~80
+    carveCorridorY(50, 60, 80, 4);  // connect into main-hall area
+
+    // === Ring & cross corridors (so it's not just one straight hall) ===
+
+    // Horizontal corridors (top / mid / bottom bands)
+    carveCorridorX(22, 12, 88, 4);  // around library / throne / bathroom level
+    carveCorridorX(50, 12, 88, 4);  // through bedrooms / main / dining level
+    carveCorridorX(72, 12, 88, 4);  // near lower bedrooms / kitchen level
+
+    // Vertical corridors (left / center / right)
+    carveCorridorY(20, 12, 88, 4);  // left vertical spine (by library/bedrooms)
+    carveCorridorY(50, 12, 96, 4);  // central spine (connects everything + entrance)
+    carveCorridorY(80, 12, 88, 4);  // right spine (by bathroom/dining/kitchen)
+
+    // Extra ring around main hall: thin gap
+    carveCorridorX(38, 36, 64, 3);  // top of ring
+    carveCorridorX(62, 36, 64, 3);  // bottom of ring
+    carveCorridorY(38, 36, 64, 3);  // left of ring
+    carveCorridorY(62, 36, 64, 3);  // right of ring
+
+    // Short connectors to rooms (to ensure multiple access points)
+    // Bedrooms ↔ central corridors
+    carveCorridorX(40, 30, 40, 3);
+    carveCorridorX(60, 30, 40, 3);
+
+    // Dining ↔ central & right corridors
+    carveCorridorX(50, 60, 70, 3);
+    carveCorridorX(50, 80, 90, 3);
+
+    // Kitchen ↔ right corridor / lower band
+    carveCorridorY(80, 70, 80, 3);
+
+    // Throne ↔ central spine
     carveCorridorY(50, 30, 40, 4);
 
-    // Bathroom ↔ throne room
-    carveCorridorX(20, 60, 65, 3);
+    // Bathroom ↔ throne / right spine
+    carveCorridorX(20, 60, 70, 3);
+    carveCorridorX(20, 80, 88, 3);
 
-    // Library ↔ upper bedroom
+    // Library ↔ bedrooms / left spine
     carveCorridorY(20, 30, 40, 3);
 
     // === Furniture helpers ===
@@ -196,12 +218,12 @@
     }
 
     function placeBedLeft(x, y) {
-      placeTile(x, y, T_BED);
+      placeTile(x, y,     T_BED);
       placeTile(x, y + 1, T_BED);
     }
 
     function placeBedRight(x, y) {
-      placeTile(x, y, T_BED);
+      placeTile(x, y,     T_BED);
       placeTile(x, y + 1, T_BED);
     }
 
@@ -226,64 +248,67 @@
     }
 
     function placeBathroomSet(x, y) {
-      // simple cluster: bath, toilet, sink
       placeTile(x, y,     T_BATH);
       placeTile(x + 2, y, T_TOILET);
       placeTile(x + 4, y, T_SINK);
     }
 
-    // === Furnish rooms ===
+    // === Furnish rooms (less clutter than before) ===
 
     // Bedrooms
-    placeBedLeft(12, 42);
-    placeBedLeft(12, 52);
-    placeBedRight(26, 42);
-    placeBedRight(26, 52);
-    placeCloset(15, 45);
-    placeCloset(25, 55);
+    placeBedLeft(12, 34);
+    placeBedLeft(12, 54);
+    placeBedRight(26, 34);
+    placeBedRight(26, 54);
+    placeCloset(15, 46);
+    placeCloset(25, 60);
 
-    // Upper bedroom
-    placeBedLeft(12, 22);
-    placeCloset(25, 25);
-
-    // Library
+    // Library: shelves mostly on walls, one row in middle
     placeShelvesVertical(11, 11, 29);
     placeShelvesVertical(29, 11, 29);
-    placeShelvesVertical(20, 11, 29);
+    placeShelvesVertical(20, 13, 27);
 
-    // Dining room: long table with chairs hinted by table tiles
-    placeTableHoriz(72, 48, 16);
+    // Dining room: one main long table
+    placeTableHoriz(72, 50, 16);
     placeCloset(88, 43); // coat closet
 
-    // Kitchen: stoves/counters approximated with tables + shelves
-    placeTableHoriz(72, 26, 8);
-    placeShelvesVertical(88, 22, 36);
+    // Kitchen: one counter wall + one prep table
+    placeTableHoriz(72, 26, 10);
+    placeShelvesVertical(88, 24, 36);
 
     // Bathroom
-    placeBathroomSet(67, 18);
-    placeCloset(78, 26);
+    placeBathroomSet(72, 18);
+    placeCloset(86, 26);
 
-    // Throne room: carpet + throne
+    // Throne room: carpet + throne, mostly open
     for (let y = 30; y <= 40; y++) {
       placeTile(49, y, T_CARPET);
       placeTile(50, y, T_CARPET);
       placeTile(51, y, T_CARPET);
     }
-    placeTile(49, 12, T_THRONE);
-    placeTile(50, 12, T_THRONE);
-    placeTile(51, 12, T_THRONE);
+    placeTile(49, 14, T_THRONE);
+    placeTile(50, 14, T_THRONE);
+    placeTile(51, 14, T_THRONE);
 
-    // Closets in main hall
+    // A few closets in corridors / main hall
     placeCloset(42, 42);
     placeCloset(58, 57);
+    placeCloset(20, 72);
+    placeCloset(80, 72);
 
-    // Candles on some walls (throne, library, dining, corridors)
-    for (let x = 42; x <= 58; x += 4) placeCandle(x, 10);
-    for (let y = 12; y <= 28; y += 4) placeCandle(10, y);
-    for (let y = 12; y <= 28; y += 4) placeCandle(30, y);
-    for (let x = 72; x <= 88; x += 4) placeCandle(x, 40);
-    for (let y = 42; y <= 58; y += 4) placeCandle(40, y);
-    for (let y = 42; y <= 58; y += 4) placeCandle(60, y);
+    // Candles: fewer, at logical spots (we'll later switch to left/right sprites)
+    // Throne room sides
+    placeCandle(42, 16);
+    placeCandle(58, 16);
+    // Library entrance
+    placeCandle(16, 32);
+    placeCandle(24, 32);
+    // Dining room entrance
+    placeCandle(72, 42);
+    placeCandle(88, 42);
+    // Main hall corners
+    placeCandle(40, 40);
+    placeCandle(60, 60);
 
     // === Player & camera ===
     let player = {
@@ -318,7 +343,6 @@
 
     function isWalkable(tx, ty) {
       const t = tileAt(tx, ty);
-      // everything except solid walls is walkable for now
       return t !== T_WALL;
     }
 
@@ -366,7 +390,7 @@
     }
 
     function drawTile(type, dx, dy) {
-      // base floor cobble style
+      // base floor
       if (type === T_FLOOR || type === T_CLOSET || type === T_CANDLE ||
           type === T_BED || type === T_TABLE || type === T_SHELF ||
           type === T_PIANO || type === T_BATH || type === T_TOILET ||
@@ -475,7 +499,6 @@
         }
       }
 
-      // player
       const px = player.x - cam.x;
       const py = player.y - cam.y;
       ctx.fillStyle = "#ffd04a";
