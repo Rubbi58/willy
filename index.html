@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Hóriver Mini – 20x20 Wall Test</title>
+  <title>Hóriver Mini – Wall Test (Fixed Light)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * {
@@ -82,12 +82,10 @@
     const T_WALL  = 1;
     const T_FLOOR = 0;
 
-    // --- simple 20x20 map: outer walls + two rooms ---
     const world = [];
     for (let y = 0; y < WORLD_H; y++) {
       const row = [];
       for (let x = 0; x < WORLD_W; x++) {
-        // outer border = wall
         if (x === 0 || y === 0 || x === WORLD_W - 1 || y === WORLD_H - 1) {
           row.push(T_WALL);
         } else {
@@ -122,7 +120,6 @@
       return tileAt(tx, ty) !== T_WALL;
     }
 
-    // --- player ---
     let player = {
       x: (WORLD_W / 2 + 0.5) * TILE,
       y: (WORLD_H / 2 + 0.5) * TILE,
@@ -191,7 +188,7 @@
     function render() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // draw tiles – VERY CLEAR:
+      // draw grid
       for (let y = 0; y < WORLD_H; y++) {
         for (let x = 0; x < WORLD_W; x++) {
           const t = world[y][x];
@@ -199,13 +196,11 @@
           const sy = y * TILE;
 
           if (t === T_WALL) {
-            // walls = bright visible brick
             ctx.fillStyle = "#553333";
             ctx.fillRect(sx, sy, TILE, TILE);
             ctx.strokeStyle = "#aa7777";
             ctx.strokeRect(sx + 0.5, sy + 0.5, TILE - 1, TILE - 1);
           } else {
-            // floor = darker cobble-ish
             ctx.fillStyle = "#202026";
             ctx.fillRect(sx, sy, TILE, TILE);
             ctx.strokeStyle = "#2f2f35";
@@ -214,60 +209,59 @@
         }
       }
 
-      // player (simple square)
+      // player
       ctx.fillStyle = "#ffd04a";
       ctx.fillRect(player.x - 8, player.y - 8, 16, 16);
 
       applyFog(player.x, player.y);
     }
 
-   function applyFog(px, py) {
-  ctx.save();
+    function applyFog(px, py) {
+      ctx.save();
 
-  // 1) Start with full darkness
-  ctx.fillStyle = "rgba(0,0,0,0.85)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // 1) Full darkness
+      ctx.fillStyle = "rgba(0,0,0,0.88)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // 2) Cut holes in the darkness (light areas)
-  ctx.globalCompositeOperation = "destination-out";
+      // 2) Cut holes (light) out of darkness
+      ctx.globalCompositeOperation = "destination-out";
 
-  // Small aura around player
-  const auraRadius = 90;
-  ctx.beginPath();
-  ctx.arc(px, py, auraRadius, 0, Math.PI * 2);
-  ctx.fill();
+      // Small aura around player
+      const auraRadius = 90;
+      ctx.beginPath();
+      ctx.arc(px, py, auraRadius, 0, Math.PI * 2);
+      ctx.fill();
 
-  // 3) Flashlight cone
-  const dx = mouseX - px;
-  const dy = mouseY - py;
-  let len = Math.hypot(dx, dy);
-  if (len < 0.001) len = 1;
-  const dirX = dx / len;
-  const dirY = dy / len;
+      // Flashlight cone
+      const dx = mouseX - px;
+      const dy = mouseY - py;
+      let len = Math.hypot(dx, dy);
+      if (len < 0.001) len = 1;
+      const dirX = dx / len;
+      const dirY = dy / len;
 
-  const coneLength = 260;          // how far the flashlight reaches
-  const coneWidth  = Math.PI / 10; // narrow cone
+      const coneLength = 260;
+      const coneWidth  = Math.PI / 10; // narrow cone
 
-  const angle = Math.atan2(dirY, dirX);
-  const a1 = angle - coneWidth;
-  const a2 = angle + coneWidth;
+      const angle = Math.atan2(dirY, dirX);
+      const a1 = angle - coneWidth;
+      const a2 = angle + coneWidth;
 
-  const tip1x = px + Math.cos(a1) * coneLength;
-  const tip1y = py + Math.sin(a1) * coneLength;
-  const tip2x = px + Math.cos(a2) * coneLength;
-  const tip2y = py + Math.sin(a2) * coneLength;
+      const tip1x = px + Math.cos(a1) * coneLength;
+      const tip1y = py + Math.sin(a1) * coneLength;
+      const tip2x = px + Math.cos(a2) * coneLength;
+      const tip2y = py + Math.sin(a2) * coneLength;
 
-  ctx.beginPath();
-  ctx.moveTo(px, py);
-  ctx.lineTo(tip1x, tip1y);
-  ctx.lineTo(tip2x, tip2y);
-  ctx.closePath();
-  ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(tip1x, tip1y);
+      ctx.lineTo(tip2x, tip2y);
+      ctx.closePath();
+      ctx.fill();
 
-  ctx.restore();
-}
+      ctx.restore();
+    }
 
-    // main loop
     let last = performance.now();
     function loop(t) {
       const dt = Math.min((t - last) / 1000, 0.05);
